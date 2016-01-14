@@ -14,6 +14,7 @@ namespace MyHomeSecureWeb.Controllers
 {
     [AuthorizeLevel(AuthorizationLevel.Anonymous)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
+    [RequireHttps]
     public class AwayStatusController : ApiController
     {
         private IAwayStatusRepository _awayStatusRepository = new AwayStatusRepository();

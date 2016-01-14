@@ -10,6 +10,7 @@ namespace MyHomeSecureWeb.Controllers
 {
     [AuthorizeLevel(AuthorizationLevel.Anonymous)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
+    [RequireHttps]
     public class LogController : ApiController
     {
         private IHomeHubRepository _homeHubRepository = new HomeHubRepository();

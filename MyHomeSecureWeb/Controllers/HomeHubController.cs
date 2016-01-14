@@ -13,11 +13,14 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Text;
 using System.Diagnostics;
+using MyHomeSecureWeb.Utilities;
+using MyHomeSecureWeb.WebSockets;
 
 namespace MyHomeSecureWeb.Controllers
 {
     [AuthorizeLevel(AuthorizationLevel.Anonymous)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
+    [RequireHttps]
     public class HomeHubController : ApiController
     {
         [HttpGet]
@@ -36,32 +39,10 @@ namespace MyHomeSecureWeb.Controllers
         private async Task ProcessWSChat(AspNetWebSocketContext context)
         {
             WebSocket socket = context.WebSocket;
-            Debug.WriteLine("Conection opened");
-            while (true)
+            using (var homeHubSocket = new HomeHubSocket(context.WebSocket))
             {
-                ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[1024]);
-                WebSocketReceiveResult result = await socket.ReceiveAsync(
-                    buffer, CancellationToken.None);
-                if (socket.State == WebSocketState.Open)
-                {
-                    string userMessage = Encoding.UTF8.GetString(
-                        buffer.Array, 0, result.Count);
-
-                    Debug.WriteLine(string.Format("Message received: {0}", userMessage));
-
-                    userMessage = "You sent: " + userMessage + " at " +
-                        DateTime.Now.ToLongTimeString();
-                    buffer = new ArraySegment<byte>(
-                        Encoding.UTF8.GetBytes(userMessage));
-                    await socket.SendAsync(
-                        buffer, WebSocketMessageType.Text, true, CancellationToken.None);
-                }
-                else
-                {
-                    break;
-                }
+                await homeHubSocket.Process();
             }
-            Debug.WriteLine("Conection closed");
         }
     }
 }
