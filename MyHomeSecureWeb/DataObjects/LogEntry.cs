@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyHomeSecureWeb.DataObjects
 {
-    public class LogEntry: EntityData
+    public class LogEntry : EntityData
     {
         public string Message { get; set; }
         public DateTime Time { get; set; }
@@ -12,5 +12,11 @@ namespace MyHomeSecureWeb.DataObjects
         public string HomeHubId { get; set; }
         [ForeignKey("HomeHubId")]
         public virtual HomeHub HomeHub { get; set; }
+    }
+
+    public class LogEntryResponse
+    {
+        public string Message { get; set; }
+        public DateTime Time { get; set; }
     }
 }

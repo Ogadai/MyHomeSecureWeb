@@ -1,6 +1,4 @@
-﻿using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -10,7 +8,7 @@ using Microsoft.WindowsAzure.Mobile.Service.Security;
 using MyHomeSecureWeb.Utilities;
 using System.Web.Http.Cors;
 using System;
-using System.Data.Entity.Validation;
+using MyHomeSecureWeb.Repositories;
 
 namespace MyHomeSecureWeb.Controllers
 {
@@ -18,15 +16,13 @@ namespace MyHomeSecureWeb.Controllers
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class AwayStatusController : ApiController
     {
-        private MobileServiceContext db = new MobileServiceContext();
-        private PasswordHash _passwordHash = new PasswordHash();
+        private IAwayStatusRepository _awayStatusRepository = new AwayStatusRepository();
+        private ILogRepository _logRepository = new LogRepository();
+        private IPasswordHash _passwordHash = new PasswordHash();
 
-        // GET: api/AwayStatus
-        public IQueryable<AwayStatusResponse> GetAwayStatus()
-        {
-            return db.AwayStatus.Select(s => new AwayStatusResponse { UserName = s.UserName, Away = s.Away });
-        }
-        
+        private static string ActionEntered = "entered";
+        private static string ActionExited = "exited";
+
         // POST: api/AwayStatus
         [ResponseType(typeof(AwayStatus))]
         public IHttpActionResult PostAwayStatus(AwayStatusRequest awayStatus)
@@ -36,7 +32,7 @@ namespace MyHomeSecureWeb.Controllers
                 return BadRequest(ModelState);
             }
 
-            var existingEntry = db.AwayStatus.SingleOrDefault(s => s.UserName == awayStatus.UserName);
+            var existingEntry = _awayStatusRepository.GetStatus(awayStatus.UserName);
             if (existingEntry == null)
             {
                 return NotFound();
@@ -53,16 +49,11 @@ namespace MyHomeSecureWeb.Controllers
                 return Unauthorized();
             }
 
-            existingEntry.Away = awayStatus.Away;
+            _awayStatusRepository.UpdateStatus(awayStatus.UserName,
+                        string.Equals(awayStatus.Action, ActionExited, StringComparison.OrdinalIgnoreCase));
 
-            db.LogEntries.Add(new LogEntry {
-                Id = Guid.NewGuid().ToString(),
-                HomeHubId = existingEntry.HomeHubId,
-                Message = string.Format("{0} {1}", existingEntry.UserName, awayStatus.Away ? "exited" : "entered"),
-                Time = DateTime.Now
-            });
-
-            db.SaveChanges();
+            _logRepository.Info(existingEntry.HomeHubId,
+                        string.Format("{0} {1}", existingEntry.UserName, existingEntry.Away ? ActionExited : ActionEntered));
 
             return StatusCode(HttpStatusCode.NoContent);
         }
@@ -71,7 +62,8 @@ namespace MyHomeSecureWeb.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                _awayStatusRepository.Dispose();
+                _logRepository.Dispose();
             }
             base.Dispose(disposing);
         }

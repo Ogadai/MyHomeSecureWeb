@@ -7,6 +7,8 @@ using MyHomeSecureWeb.Models;
 using Microsoft.WindowsAzure.Mobile.Service;
 using System.Net.Http.Headers;
 using MyHomeSecureWeb.Utilities;
+using Microsoft.WindowsAzure.Mobile.Service.Security;
+using System.Web.Http.Cors;
 
 namespace MyHomeSecureWeb
 {
@@ -19,7 +21,17 @@ namespace MyHomeSecureWeb
 
             // Use this class to set WebAPI configuration options
             HttpConfiguration config = ServiceConfig.Initialize(new ConfigBuilder(options));
-            config.EnableCors();
+
+            //var container = new UnityContainer();
+            //container.RegisterType<IAwayStatusRepository, AwayStatusRepository>(new HierarchicalLifetimeManager());
+            //container.RegisterType<ILogRepository, LogRepository>(new HierarchicalLifetimeManager());
+
+            //container.RegisterType<IServiceSettingsProvider, ServiceSettingsProvider>(new HierarchicalLifetimeManager());
+            //container.RegisterType<IServiceTokenHandler, ServiceTokenHandler>(new HierarchicalLifetimeManager());
+
+            //config.DependencyResolver = new UnityResolver(container);
+            var cors = new EnableCorsAttribute("*", "*", "*");
+            config.EnableCors(cors);
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
 
             // To display errors in the browser during development, uncomment the following
@@ -32,7 +44,7 @@ namespace MyHomeSecureWeb
 
     public class MobileServiceInitializer : DropCreateDatabaseIfModelChanges<MobileServiceContext>
     {
-        private PasswordHash _passwordHash = new PasswordHash();
+        private IPasswordHash _passwordHash = new PasswordHash();
 
         protected override void Seed(MobileServiceContext context)
         {
@@ -41,6 +53,7 @@ namespace MyHomeSecureWeb
             var hub = new HomeHub
             {
                 Id = Guid.NewGuid().ToString(),
+                Name = "andy.lee.surfer@gmail.com",
                 TokenHash = tokenHash,
                 TokenSalt = salt
             };

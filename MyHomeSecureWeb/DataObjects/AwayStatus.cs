@@ -19,15 +19,9 @@ namespace MyHomeSecureWeb.DataObjects
     public class AwayStatusRequest
     {
         public string UserName { get; set; }
-        public bool Away { get; set; }
+        public string Action { get; set; }
 
         public string Token { get; set; }
-    }
-
-    public class AwayStatusResponse
-    {
-        public string UserName { get; set; }
-        public bool Away { get; set; }
     }
 
 }

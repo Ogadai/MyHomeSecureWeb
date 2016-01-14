@@ -5,6 +5,8 @@ namespace MyHomeSecureWeb.DataObjects
 {
     public class HomeHub : EntityData
     {
+        public string Name { get; set; }
+
         public byte[] TokenHash { get; set; }
         public byte[] TokenSalt { get; set; }
 

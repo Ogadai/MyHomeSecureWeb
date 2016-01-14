@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MyHomeSecureWeb.Utilities
 {
-    public class PasswordHash
+    public class PasswordHash : IPasswordHash
     {
         public byte[] Hash(string value, byte[] salt)
         {
