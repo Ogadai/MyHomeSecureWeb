@@ -11,9 +11,20 @@ namespace MyHomeSecureWeb.Repositories
 
         public void Info(string homeHubId, string message)
         {
+            LogEntry(homeHubId, "Info", message);
+        }
+
+        public void Error(string homeHubId, string message)
+        {
+            LogEntry(homeHubId, "Error", message);
+        }
+
+        private void LogEntry(string homeHubId, string severity, string message)
+        {
             db.LogEntries.Add(new LogEntry
             {
                 Id = Guid.NewGuid().ToString(),
+                Severity = severity,
                 HomeHubId = homeHubId,
                 Message = message,
                 Time = DateTime.Now

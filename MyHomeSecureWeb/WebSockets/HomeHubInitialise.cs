@@ -1,0 +1,102 @@
+﻿using MyHomeSecureWeb.Models;
+using System.Diagnostics;
+using MyHomeSecureWeb.Repositories;
+using MyHomeSecureWeb.Utilities;
+using System.Linq;
+
+namespace MyHomeSecureWeb.WebSockets
+{
+    public class HomeHubInitialise : ISocketTarget
+    {
+        private IHomeHubSocket _homeHubSocket;
+        private ILogRepository _logRepository = new LogRepository();
+        private IHomeHubRepository _homeHubRepository = new HomeHubRepository();
+        private IAwayStatusRepository _awayStatusRepository = new AwayStatusRepository();
+        private IPasswordHash _passwordHash = new PasswordHash();
+
+        public HomeHubInitialise(IHomeHubSocket homeHubSocket)
+        {
+            _homeHubSocket = homeHubSocket;
+        }
+
+        public void Initialise(HubInitialiseRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Name) || string.IsNullOrEmpty(request.Token))
+            {
+                return;
+            }
+            Debug.WriteLine(string.Format("Initialise hub: {0}", request.Name));
+
+            var hub = _homeHubRepository.GetHub(request.Name);
+            if (hub != null)
+            {
+                // Validate access to hub
+                var tokenHash = _passwordHash.Hash(request.Token, hub.TokenSalt);
+                if (!tokenHash.SequenceEqual(hub.TokenHash))
+                {
+                    _logRepository.Error(hub.Id, "Attempt to access hub with invalid token");
+                    return;
+                }
+            }
+            else
+            {
+                // Create new hub
+                var salt = _passwordHash.CreateSalt(32);
+                var tokenHash = _passwordHash.Hash(request.Token, salt);
+                hub = _homeHubRepository.AddHub(request.Name, tokenHash, salt);
+            }
+
+            InitialiseUsers(hub.Id, request.Users);
+            var setStates = InitialiseStates(hub.Id, request.States);
+
+            // Tell the hub what the intial states are
+            _homeHubSocket.SendMessage(new HubSetInitialStates { States = setStates });
+
+            // Set the initialised home hub id
+            _homeHubSocket.HomeHubId = hub.Id;
+        }
+
+        private void InitialiseUsers(string homeHubId, HubInitialiseUser[] users)
+        {
+            var hubUsers = _awayStatusRepository.GetAllForHub(homeHubId).ToList();
+
+            foreach(var user in users)
+            {
+                if (!string.IsNullOrEmpty(user.Name) && !string.IsNullOrEmpty(user.Token))
+                {
+                    var existingUser = hubUsers.SingleOrDefault(u => u.UserName == user.Name);
+                    if (existingUser != null)
+                    {
+                        _awayStatusRepository.SetToken(user.Name, _passwordHash.Hash(user.Token, existingUser.TokenSalt));
+                        hubUsers.Remove(existingUser);
+                    }
+                    else
+                    {
+                        var salt = _passwordHash.CreateSalt(32);
+                        var tokenHash = _passwordHash.Hash(user.Token, salt);
+
+                        _awayStatusRepository.AddUser(user.Name, homeHubId, tokenHash, salt);
+                    }
+                }
+            }
+
+            // Remove unused users
+            foreach(var user in hubUsers)
+            {
+                _awayStatusRepository.RemoveUser(user.UserName);
+            }
+        }
+
+        private HubState[] InitialiseStates(string homeHubId, string[] states)
+        {
+            return null;
+        }
+
+        public void Dispose()
+        {
+            _logRepository.Dispose();
+            _homeHubRepository.Dispose();
+            _awayStatusRepository.Dispose();
+        }
+    }
+}

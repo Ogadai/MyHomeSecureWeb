@@ -6,5 +6,6 @@ namespace MyHomeSecureWeb.Repositories
     {
         void Dispose();
         HomeHub GetHub(string name);
+        HomeHub AddHub(string name, byte[] tokenHash, byte[] salt);
     }
 }

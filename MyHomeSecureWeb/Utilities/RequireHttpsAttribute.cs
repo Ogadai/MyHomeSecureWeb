@@ -10,7 +10,8 @@ namespace MyHomeSecureWeb.Utilities
     {
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            if (actionContext.Request.RequestUri.Scheme != Uri.UriSchemeHttps)
+            if (actionContext.Request.RequestUri.Scheme != Uri.UriSchemeHttps
+                && actionContext.Request.RequestUri.Host != "localhost")
             {
                 actionContext.Response = new HttpResponseMessage(HttpStatusCode.Forbidden);
             }

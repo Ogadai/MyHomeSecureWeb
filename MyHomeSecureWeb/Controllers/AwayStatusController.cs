@@ -50,11 +50,14 @@ namespace MyHomeSecureWeb.Controllers
                 return Unauthorized();
             }
 
-            _awayStatusRepository.UpdateStatus(awayStatus.UserName,
-                        string.Equals(awayStatus.Action, ActionExited, StringComparison.OrdinalIgnoreCase));
-
-            _logRepository.Info(existingEntry.HomeHubId,
-                        string.Format("{0} {1}", existingEntry.UserName, existingEntry.Away ? ActionExited : ActionEntered));
+            var newAwayStatus = string.Equals(awayStatus.Action, ActionExited, StringComparison.OrdinalIgnoreCase);
+            if (newAwayStatus != existingEntry.Away)
+            {
+                _awayStatusRepository.UpdateStatus(awayStatus.UserName, newAwayStatus);
+                CheckInOutMonitor.UserInOut(existingEntry.HomeHubId, awayStatus.UserName, newAwayStatus);
+                _logRepository.Info(existingEntry.HomeHubId,
+                            string.Format("{0} {1}", awayStatus.UserName, newAwayStatus ? ActionExited : ActionEntered));
+            }
 
             return StatusCode(HttpStatusCode.NoContent);
         }

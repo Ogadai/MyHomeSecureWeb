@@ -1,8 +1,5 @@
 ﻿using System.Web.WebSockets;
 using Microsoft.WindowsAzure.Mobile.Service.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web;
@@ -10,9 +7,6 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
-using System.Threading;
-using System.Text;
-using System.Diagnostics;
 using MyHomeSecureWeb.Utilities;
 using MyHomeSecureWeb.WebSockets;
 

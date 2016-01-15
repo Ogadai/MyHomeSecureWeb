@@ -6,6 +6,7 @@ namespace MyHomeSecureWeb.DataObjects
 {
     public class LogEntry : EntityData
     {
+        public string Severity { get; set; }
         public string Message { get; set; }
         public DateTime Time { get; set; }
 

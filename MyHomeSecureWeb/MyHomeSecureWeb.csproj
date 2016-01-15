@@ -252,6 +252,7 @@
     <Compile Include="DataObjects\AwayStatus.cs" />
     <Compile Include="DataObjects\HomeHub.cs" />
     <Compile Include="DataObjects\LogEntry.cs" />
+    <Compile Include="Models\HubAwayStatus.cs" />
     <Compile Include="Models\MobileServiceContext.cs" />
     <Compile Include="Models\HubInitialise.cs" />
     <Compile Include="Models\SocketMessageBase.cs" />
@@ -266,11 +267,17 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\CheckInOutMonitor.cs" />
     <Compile Include="Utilities\IPasswordHash.cs" />
     <Compile Include="Utilities\PasswordHash.cs" />
     <Compile Include="Utilities\RequireHttpsAttribute.cs" />
+    <Compile Include="WebSockets\HomeHubAwayChange.cs" />
+    <Compile Include="WebSockets\HomeHubInitialise.cs" />
+    <Compile Include="WebSockets\HomeHubMessage.cs" />
+    <Compile Include="WebSockets\IHomeHubSocket.cs" />
+    <Compile Include="WebSockets\ISocketSender.cs" />
+    <Compile Include="WebSockets\ISocketTarget.cs" />
     <Compile Include="WebSockets\HomeHubSocket.cs" />
-    <Compile Include="WebSockets\SocketBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
