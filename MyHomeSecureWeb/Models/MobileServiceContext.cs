@@ -30,6 +30,7 @@ namespace MyHomeSecureWeb.Models
         public DbSet<AwayStatus> AwayStatus { get; set; }
         public DbSet<HomeHub> HomeHubs { get; set; }
         public DbSet<LogEntry> LogEntries { get; set; }
+        public DbSet<HubState> HubStates { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

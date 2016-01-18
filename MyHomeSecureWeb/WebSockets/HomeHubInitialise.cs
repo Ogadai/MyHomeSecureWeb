@@ -3,6 +3,7 @@ using System.Diagnostics;
 using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace MyHomeSecureWeb.WebSockets
 {
@@ -12,6 +13,7 @@ namespace MyHomeSecureWeb.WebSockets
         private ILogRepository _logRepository = new LogRepository();
         private IHomeHubRepository _homeHubRepository = new HomeHubRepository();
         private IAwayStatusRepository _awayStatusRepository = new AwayStatusRepository();
+        private IHubStateRepository _hubStateRepository = new HubStateRepository();
         private IPasswordHash _passwordHash = new PasswordHash();
 
         public HomeHubInitialise(IHomeHubSocket homeHubSocket)
@@ -50,7 +52,7 @@ namespace MyHomeSecureWeb.WebSockets
             var setStates = InitialiseStates(hub.Id, request.States);
 
             // Tell the hub what the intial states are
-            _homeHubSocket.SendMessage(new HubSetInitialStates { States = setStates });
+            _homeHubSocket.SendMessage(new HubChangeStates { States = setStates });
 
             // Set the initialised home hub id
             _homeHubSocket.HomeHubId = hub.Id;
@@ -70,7 +72,7 @@ namespace MyHomeSecureWeb.WebSockets
                         _awayStatusRepository.SetToken(user.Name, _passwordHash.Hash(user.Token, existingUser.TokenSalt));
                         hubUsers.Remove(existingUser);
                     }
-                    else
+                    else if (_awayStatusRepository.GetStatus(user.Name) == null)
                     {
                         var salt = _passwordHash.CreateSalt(32);
                         var tokenHash = _passwordHash.Hash(user.Token, salt);
@@ -87,9 +89,36 @@ namespace MyHomeSecureWeb.WebSockets
             }
         }
 
-        private HubState[] InitialiseStates(string homeHubId, string[] states)
+        private HubChangeState[] InitialiseStates(string homeHubId, string[] states)
         {
-            return null;
+            var hubStates = _hubStateRepository.GetAllForHub(homeHubId).ToList();
+            var changeStates = new List<HubChangeState>();
+
+            foreach (var stateName in states)
+            {
+                if (!string.IsNullOrEmpty(stateName))
+                {
+                    var existingState = hubStates.SingleOrDefault(u => u.Name == stateName);
+                    if (existingState != null)
+                    {
+                        changeStates.Add(new HubChangeState { Name = stateName, Active = existingState.Active });
+                        hubStates.Remove(existingState);
+                    }
+                    else
+                    {
+                        _hubStateRepository.AddState(homeHubId, stateName);
+                    }
+                }
+            }
+
+            // Remove unused states
+            foreach (var state in hubStates)
+            {
+                _hubStateRepository.RemoveState(homeHubId, state.Name);
+            }
+
+            // Return the change state list
+            return changeStates.ToArray();
         }
 
         public void Dispose()
@@ -97,6 +126,7 @@ namespace MyHomeSecureWeb.WebSockets
             _logRepository.Dispose();
             _homeHubRepository.Dispose();
             _awayStatusRepository.Dispose();
+            _hubStateRepository.Dispose();
         }
     }
 }

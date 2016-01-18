@@ -1,9 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyHomeSecureWeb", "MyHomeSecureWeb\MyHomeSecureWeb.csproj", "{3AD1FB56-6A05-41E8-8473-0B9D1BC34192}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "MyHomeSecureHub", "..\MyHomeSecureHub\", "{FB58E5DC-66FF-4CCB-BE44-7596C49E0744}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_54412"
+		Debug.AspNetCompiler.PhysicalPath = "..\MyHomeSecureHub\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54412\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_54412"
+		Release.AspNetCompiler.PhysicalPath = "..\MyHomeSecureHub\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54412\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "54412"
+		SlnRelativePath = "..\MyHomeSecureHub\"
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +36,10 @@ Global
 		{3AD1FB56-6A05-41E8-8473-0B9D1BC34192}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AD1FB56-6A05-41E8-8473-0B9D1BC34192}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AD1FB56-6A05-41E8-8473-0B9D1BC34192}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB58E5DC-66FF-4CCB-BE44-7596C49E0744}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB58E5DC-66FF-4CCB-BE44-7596C49E0744}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB58E5DC-66FF-4CCB-BE44-7596C49E0744}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB58E5DC-66FF-4CCB-BE44-7596C49E0744}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
