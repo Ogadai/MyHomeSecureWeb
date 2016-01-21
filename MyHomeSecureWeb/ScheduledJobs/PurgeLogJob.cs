@@ -12,7 +12,7 @@ namespace MyHomeSecureWeb.ScheduledJobs
 
         public override Task ExecuteAsync()
         {
-            Services.Log.Info("Hello from scheduled job!");
+            Services.Log.Info("Running Job: Purge old log entries");
             using (var logRepository = new LogRepository())
             {
                 logRepository.PurgeOldLogEntries();

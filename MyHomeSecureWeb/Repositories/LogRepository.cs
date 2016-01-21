@@ -41,7 +41,7 @@ namespace MyHomeSecureWeb.Repositories
         public void PurgeOldLogEntries()
         {
             db.Database.ExecuteSqlCommand(
-                "DELETE FROM MyHomeSecureWeb.LogEntries WHERE Time < {0}",
+                "DELETE FROM ogadai_secure.LogEntries WHERE Time < {0}",
                 DateTime.Now.AddDays(-2));
         }
 
