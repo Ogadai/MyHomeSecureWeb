@@ -16,7 +16,7 @@ namespace MyHomeSecureWeb.Repositories
 
         public void SetState(string homeHubId, string name, bool state)
         {
-            GetStateEntry(homeHubId, name).Active = true;
+            GetStateEntry(homeHubId, name).Active = state;
             db.SaveChanges();
         }
         

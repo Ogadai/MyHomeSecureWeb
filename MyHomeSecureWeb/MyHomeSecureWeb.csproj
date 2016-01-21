@@ -267,7 +267,7 @@
     <Compile Include="Repositories\IHubStateRepository.cs" />
     <Compile Include="Repositories\ILogRepository.cs" />
     <Compile Include="Repositories\LogRepository.cs" />
-    <Compile Include="ScheduledJobs\SampleJob.cs" />
+    <Compile Include="ScheduledJobs\PurgeLogJob.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

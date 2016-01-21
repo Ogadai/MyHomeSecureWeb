@@ -26,6 +26,48 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "MyHomeSecureHub", "..\MyHom
 		SlnRelativePath = "..\MyHomeSecureHub\"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "MyHomeSecureNode", "..\MyHomeSecureNode\", "{ED5D86D5-1D98-4CE8-971D-9FEF5221711E}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_57902"
+		Debug.AspNetCompiler.PhysicalPath = "..\MyHomeSecureNode\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_57902\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_57902"
+		Release.AspNetCompiler.PhysicalPath = "..\MyHomeSecureNode\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_57902\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "57902"
+		SlnRelativePath = "..\MyHomeSecureNode\"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "rules", "..\rules\", "{208CAFBC-EB84-44B3-B3C0-15D878244F9F}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_51559"
+		Debug.AspNetCompiler.PhysicalPath = "..\rules\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51559\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_51559"
+		Release.AspNetCompiler.PhysicalPath = "..\rules\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51559\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "51559"
+		SlnRelativePath = "..\rules\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +82,14 @@ Global
 		{FB58E5DC-66FF-4CCB-BE44-7596C49E0744}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB58E5DC-66FF-4CCB-BE44-7596C49E0744}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB58E5DC-66FF-4CCB-BE44-7596C49E0744}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{ED5D86D5-1D98-4CE8-971D-9FEF5221711E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED5D86D5-1D98-4CE8-971D-9FEF5221711E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED5D86D5-1D98-4CE8-971D-9FEF5221711E}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED5D86D5-1D98-4CE8-971D-9FEF5221711E}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{208CAFBC-EB84-44B3-B3C0-15D878244F9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{208CAFBC-EB84-44B3-B3C0-15D878244F9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{208CAFBC-EB84-44B3-B3C0-15D878244F9F}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{208CAFBC-EB84-44B3-B3C0-15D878244F9F}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

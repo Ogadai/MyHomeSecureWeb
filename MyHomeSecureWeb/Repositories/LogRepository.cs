@@ -38,6 +38,13 @@ namespace MyHomeSecureWeb.Repositories
             return db.LogEntries.Where(l => string.Equals(l.HomeHubId, homeHubId));
         }
 
+        public void PurgeOldLogEntries()
+        {
+            db.Database.ExecuteSqlCommand(
+                "DELETE FROM MyHomeSecureWeb.LogEntries WHERE Time < {0}",
+                DateTime.Now.AddDays(-2));
+        }
+
         public void Dispose()
         {
             db.Dispose();

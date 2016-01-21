@@ -9,5 +9,6 @@ namespace MyHomeSecureWeb.Repositories
         void Info(string homeHubId, string message);
         void Error(string homeHubId, string message);
         IQueryable<LogEntry> GetLogEntries(string homeHubId);
+        void PurgeOldLogEntries();
     }
 }
