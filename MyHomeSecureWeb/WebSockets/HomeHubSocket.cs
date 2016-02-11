@@ -1,27 +1,28 @@
-﻿using MyHomeSecureWeb.Models;
-using MyHomeSecureWeb.Repositories;
+﻿using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
-using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MyHomeSecureWeb.WebSockets
 {
-    public class HomeHubSocket : IHomeHubSocket, IDisposable
+    public class HomeHubSocket : SocketBase, IHomeHubSocket, IDisposable
     {
-        private WebSocket _socket;
-
         private string _homeHubId;
         private CheckInOutMonitor _checkInOutMonitor;
+        private ChatHub _chatHub;
 
-        public HomeHubSocket(WebSocket socket)
+        public HomeHubSocket(WebSocket socket) : base(socket)
         {
-            _socket = socket;
-            Debug.WriteLine("Conection opened");
+            Debug.WriteLine("HomeHub Conection opened");
+        }
+
+        public ChatHub ChatHub
+        {
+            get
+            {
+                return _chatHub;
+            }
         }
 
         public string HomeHubId
@@ -39,9 +40,19 @@ namespace MyHomeSecureWeb.WebSockets
                     LogConnectionMessage("Hub has disconnected");
                 }
 
+                if (_chatHub != null)
+                {
+                    _chatHub.Dispose();
+                    _chatHub.HomeMessage -= _chatHub_HomeMessage;
+                }
+
                 _homeHubId = value;
+
                 _checkInOutMonitor = CheckInOutMonitor.Create(_homeHubId);
                 _checkInOutMonitor.CheckInOut += _checkInOutMonitor_CheckInOut;
+
+                _chatHub = ChatHub.Get(_homeHubId);
+                _chatHub.HomeMessage += _chatHub_HomeMessage;
 
                 using (var homeHubAwayChange = new HomeHubAwayChange(this))
                 {
@@ -49,6 +60,11 @@ namespace MyHomeSecureWeb.WebSockets
                     LogConnectionMessage("Hub has connected");
                 }
             }
+        }
+
+        private void _chatHub_HomeMessage(Models.SocketMessageBase message)
+        {
+            SendMessage(message);
         }
 
         private void _checkInOutMonitor_CheckInOut(string userName, bool away)
@@ -62,74 +78,25 @@ namespace MyHomeSecureWeb.WebSockets
             }
         }
 
-        public async Task Process()
+        public override ISocketTarget CreateMessageInstance(Type type)
         {
-            ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[1024]);
-            while (true)
-            {
-                WebSocketReceiveResult result = await _socket.ReceiveAsync(
-                    buffer, CancellationToken.None);
-                if (_socket.State == WebSocketState.Open)
-                {
-                    string message = Encoding.UTF8.GetString(
-                        buffer.Array, 0, result.Count);
-
-                    ReceivedMessage(message);
-                }
-                else
-                {
-                    break;
-                }
-            }
+            return Activator.CreateInstance(type, this) as ISocketTarget;
         }
-
-        public void ReceivedMessage(string message)
-        {
-            var decoded = JsonConvert.DeserializeObject<SocketMessageBase>(message);
-
-            var targetName = string.Format("MyHomeSecureWeb.WebSockets.HomeHub{0}", decoded.Method);
-            var target = Activator.CreateInstance(Type.GetType(targetName), this) as ISocketTarget;
-            using (target)
-            {
-                var methodInfo = target.GetType().GetMethod(decoded.Method);
-                if (methodInfo != null)
-                {
-                    var parameters = methodInfo.GetParameters();
-                    if (parameters.Length > 0)
-                    {
-                        var methodParams = new[]
-                        {
-                            JsonConvert.DeserializeObject(message, parameters[0].ParameterType)
-                        };
-                        methodInfo.Invoke(target, methodParams);
-                    }
-                }
-            }
-        }
-
-        public void SendMessage<T>(T message)
-        {
-            SendMessage(JsonConvert.SerializeObject(message));
-        }
-
-        private void SendMessage(string message)
-        {
-            ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[1024]);
-            buffer = new ArraySegment<byte>(
-                Encoding.UTF8.GetBytes(message));
-            _socket.SendAsync(
-                buffer, WebSocketMessageType.Text, true, CancellationToken.None);
-        }
-
+        
         public virtual void Dispose()
         {
-            Debug.WriteLine("Conection closed");
+            Debug.WriteLine("HomeHub Conection closed");
             if (_checkInOutMonitor != null)
             {
                 _checkInOutMonitor.CheckInOut -= _checkInOutMonitor_CheckInOut;
                 _checkInOutMonitor.Dispose();
             }
 
+            if (_chatHub != null)
+            {
+                _chatHub.HomeMessage -= _chatHub_HomeMessage;
+                _chatHub.Dispose();
+            }
 
             LogConnectionMessage("Hub has disconnected");
         }

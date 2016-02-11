@@ -49,10 +49,7 @@ namespace MyHomeSecureWeb.WebSockets
             }
 
             InitialiseUsers(hub.Id, request.Users);
-            var setStates = InitialiseStates(hub.Id, request.States);
-
-            // Tell the hub what the intial states are
-            _homeHubSocket.SendMessage(new HubChangeStates { States = setStates });
+            InitialiseStates(hub.Id, request.States);
 
             // Set the initialised home hub id
             _homeHubSocket.HomeHubId = hub.Id;
@@ -89,10 +86,9 @@ namespace MyHomeSecureWeb.WebSockets
             }
         }
 
-        private HubChangeState[] InitialiseStates(string homeHubId, string[] states)
+        private void InitialiseStates(string homeHubId, string[] states)
         {
             var hubStates = _hubStateRepository.GetAllForHub(homeHubId).ToList();
-            var changeStates = new List<HubChangeState>();
 
             foreach (var stateName in states)
             {
@@ -101,8 +97,11 @@ namespace MyHomeSecureWeb.WebSockets
                     var existingState = hubStates.SingleOrDefault(u => u.Name == stateName);
                     if (existingState != null)
                     {
-                        changeStates.Add(new HubChangeState { Name = stateName, Active = existingState.Active });
                         hubStates.Remove(existingState);
+                        if (existingState.Active)
+                        {
+                            _hubStateRepository.SetState(homeHubId, existingState.Name, false);
+                        }
                     }
                     else
                     {
@@ -116,9 +115,6 @@ namespace MyHomeSecureWeb.WebSockets
             {
                 _hubStateRepository.RemoveState(homeHubId, state.Name);
             }
-
-            // Return the change state list
-            return changeStates.ToArray();
         }
 
         public void Dispose()

@@ -29,6 +29,11 @@ namespace MyHomeSecureWeb.Repositories
 
         public void AddUser(string userName, string homeHubId, byte[] tokenHash, byte[] salt)
         {
+            if (db.AwayStatus.SingleOrDefault(s => s.UserName == userName) != null)
+            {
+                throw new Exception(string.Format("The user '{0}' already exists", userName));
+            }
+
             db.AwayStatus.Add(new AwayStatus
             {
                 Id = Guid.NewGuid().ToString(),

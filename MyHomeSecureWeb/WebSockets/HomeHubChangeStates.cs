@@ -24,6 +24,8 @@ namespace MyHomeSecureWeb.WebSockets
                     _logRepository.Info(_homeHubSocket.HomeHubId,
                         string.Format("{0} changed to {1}", state.Name, state.Active ? "Active" : "Inactive"));
                 }
+
+                _homeHubSocket.ChatHub.MessageToClients(states);
             }
         }
 

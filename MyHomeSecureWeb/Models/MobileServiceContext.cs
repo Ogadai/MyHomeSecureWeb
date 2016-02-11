@@ -27,6 +27,7 @@ namespace MyHomeSecureWeb.Models
         {
         }
 
+        public DbSet<TodoItem> TodoItems { get; set; }
         public DbSet<AwayStatus> AwayStatus { get; set; }
         public DbSet<HomeHub> HomeHubs { get; set; }
         public DbSet<LogEntry> LogEntries { get; set; }

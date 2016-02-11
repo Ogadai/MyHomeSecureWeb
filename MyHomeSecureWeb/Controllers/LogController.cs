@@ -3,6 +3,7 @@ using MyHomeSecureWeb.DataObjects;
 using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -16,6 +17,15 @@ namespace MyHomeSecureWeb.Controllers
         private IHomeHubRepository _homeHubRepository = new HomeHubRepository();
         private ILogRepository _logRepository = new LogRepository();
         private IPasswordHash _passwordHash = new PasswordHash();
+        private ILookupToken _lookupToken = new LookupToken();
+
+        // GET api/log
+        [AuthorizeLevel(AuthorizationLevel.User)]
+        public async Task<IHttpActionResult> GetLog()
+        {
+            var hubId = await _lookupToken.GetHomeHubId(this.User);
+            return GetLogEntriesForHub(hubId);
+        }
 
         // GET api/log/id
         public IHttpActionResult GetLogEntries(string id, string token)
@@ -37,10 +47,23 @@ namespace MyHomeSecureWeb.Controllers
                 return Unauthorized();
             }
 
-            var entries = _logRepository.GetLogEntries(hub.Id)
-                    .Select(l => new LogEntryResponse { Message = l.Message, Time = l.Time });
+            return GetLogEntriesForHub(hub.Id);
+        }
 
-            return Ok(entries);
+        private IHttpActionResult GetLogEntriesForHub(string hubId)
+        {
+            return Ok(_logRepository.GetLogEntries(hubId)
+                    .Select(l => new LogEntryResponse { Message = l.Message, Time = l.Time }));
+        }
+        
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _homeHubRepository.Dispose();
+                _logRepository.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }
