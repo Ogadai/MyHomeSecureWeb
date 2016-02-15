@@ -21,14 +21,14 @@ namespace MyHomeSecureWeb.Controllers
 
         // GET api/log
         [AuthorizeLevel(AuthorizationLevel.User)]
-        public async Task<IHttpActionResult> GetLog()
+        public async Task<IHttpActionResult> GetLog(bool priority)
         {
             var hubId = await _lookupToken.GetHomeHubId(this.User);
-            return GetLogEntriesForHub(hubId);
+            return GetLogEntriesForHub(hubId, priority);
         }
 
         // GET api/log/id
-        public IHttpActionResult GetLogEntries(string id, string token)
+        public IHttpActionResult GetLogEntries(string id, string token, bool priority)
         {
             var hub = _homeHubRepository.GetHub(id);
             if (hub == null)
@@ -47,12 +47,12 @@ namespace MyHomeSecureWeb.Controllers
                 return Unauthorized();
             }
 
-            return GetLogEntriesForHub(hub.Id);
+            return GetLogEntriesForHub(hub.Id, priority);
         }
 
-        private IHttpActionResult GetLogEntriesForHub(string hubId)
+        private IHttpActionResult GetLogEntriesForHub(string hubId, bool priority)
         {
-            return Ok(_logRepository.GetLogEntries(hubId)
+            return Ok(_logRepository.GetLogEntries(hubId, priority)
                     .Select(l => new LogEntryResponse { Message = l.Message, Time = l.Time }));
         }
         

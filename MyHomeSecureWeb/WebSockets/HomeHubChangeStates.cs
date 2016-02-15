@@ -1,4 +1,5 @@
-﻿using MyHomeSecureWeb.Models;
+﻿using System;
+using MyHomeSecureWeb.Models;
 using MyHomeSecureWeb.Repositories;
 
 namespace MyHomeSecureWeb.WebSockets
@@ -21,7 +22,11 @@ namespace MyHomeSecureWeb.WebSockets
                 foreach(var state in states.States)
                 {
                     _hubStateRepository.SetState(_homeHubSocket.HomeHubId, state.Name, state.Active);
-                    _logRepository.Info(_homeHubSocket.HomeHubId,
+
+                    string severity = string.Equals(state.Name, "Away", StringComparison.OrdinalIgnoreCase)
+                                ? "Priority" : "Info";
+
+                    _logRepository.LogEntry(_homeHubSocket.HomeHubId, severity,
                         string.Format("{0} changed to {1}", state.Name, state.Active ? "Active" : "Inactive"));
                 }
 

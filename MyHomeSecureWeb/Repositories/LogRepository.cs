@@ -14,12 +14,17 @@ namespace MyHomeSecureWeb.Repositories
             LogEntry(homeHubId, "Info", message);
         }
 
+        public void Priority(string homeHubId, string message)
+        {
+            LogEntry(homeHubId, "Priority", message);
+        }
+
         public void Error(string homeHubId, string message)
         {
             LogEntry(homeHubId, "Error", message);
         }
 
-        private void LogEntry(string homeHubId, string severity, string message)
+        public void LogEntry(string homeHubId, string severity, string message)
         {
             db.LogEntries.Add(new LogEntry
             {
@@ -33,9 +38,12 @@ namespace MyHomeSecureWeb.Repositories
             db.SaveChanges();
         }
 
-        public IQueryable<LogEntry> GetLogEntries(string homeHubId)
+        public IQueryable<LogEntry> GetLogEntries(string homeHubId, bool priority)
         {
-            return db.LogEntries.Where(l => string.Equals(l.HomeHubId, homeHubId));
+            return db.LogEntries.Where(l => 
+                    string.Equals(l.HomeHubId, homeHubId)
+                    && (!priority || l.Severity == "Priority" || l.Severity == "Error")
+                );
         }
 
         public void PurgeOldLogEntries()
