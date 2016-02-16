@@ -24,7 +24,8 @@ namespace MyHomeSecureWeb.Controllers
             if (currentContext.IsWebSocketRequest ||
                 currentContext.IsWebSocketRequestUpgrading)
             {
-                currentContext.AcceptWebSocketRequest(ProcessWSChat);
+
+                currentContext.AcceptWebSocketRequest(ProcessWSChat, new AspNetWebSocketOptions { SubProtocol = "echo-protocol" });
                 return Request.CreateResponse(HttpStatusCode.SwitchingProtocols);
             }
             return Request.CreateResponse(HttpStatusCode.NotFound);
