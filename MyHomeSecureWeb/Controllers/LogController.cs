@@ -21,33 +21,10 @@ namespace MyHomeSecureWeb.Controllers
 
         // GET api/log
         [AuthorizeLevel(AuthorizationLevel.User)]
-        public async Task<IHttpActionResult> GetLog(bool priority)
+        public async Task<IHttpActionResult> GetLog(bool priority = true)
         {
             var hubId = await _lookupToken.GetHomeHubId(this.User);
             return GetLogEntriesForHub(hubId, priority);
-        }
-
-        // GET api/log/id
-        public IHttpActionResult GetLogEntries(string id, string token, bool priority)
-        {
-            var hub = _homeHubRepository.GetHub(id);
-            if (hub == null)
-            {
-                return NotFound();
-            }
-
-            if (string.IsNullOrEmpty(token))
-            {
-                return Unauthorized();
-            }
-
-            var tokenHash = _passwordHash.Hash(token, hub.TokenSalt);
-            if (!tokenHash.SequenceEqual(hub.TokenHash))
-            {
-                return Unauthorized();
-            }
-
-            return GetLogEntriesForHub(hub.Id, priority);
         }
 
         private IHttpActionResult GetLogEntriesForHub(string hubId, bool priority)

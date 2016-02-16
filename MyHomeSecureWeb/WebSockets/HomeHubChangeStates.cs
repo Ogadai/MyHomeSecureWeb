@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using MyHomeSecureWeb.Models;
 using MyHomeSecureWeb.Repositories;
 
@@ -9,6 +10,8 @@ namespace MyHomeSecureWeb.WebSockets
         private IHomeHubSocket _homeHubSocket;
         private IHubStateRepository _hubStateRepository = new HubStateRepository();
         private ILogRepository _logRepository = new LogRepository();
+
+        private string[] _priorityStates = new[] { "Away", "Alert", "Alarm" };
 
         public HomeHubChangeStates(IHomeHubSocket homeHubSocket)
         {
@@ -21,13 +24,14 @@ namespace MyHomeSecureWeb.WebSockets
             {
                 foreach(var state in states.States)
                 {
-                    _hubStateRepository.SetState(_homeHubSocket.HomeHubId, state.Name, state.Active);
+                    var changed = _hubStateRepository.SetState(_homeHubSocket.HomeHubId, state.Name, state.Active);
 
-                    string severity = string.Equals(state.Name, "Away", StringComparison.OrdinalIgnoreCase)
-                                ? "Priority" : "Info";
-
-                    _logRepository.LogEntry(_homeHubSocket.HomeHubId, severity,
-                        string.Format("{0} changed to {1}", state.Name, state.Active ? "Active" : "Inactive"));
+                    if (changed)
+                    {
+                        string severity = _priorityStates.Contains(state.Name) ? "Priority" : "Info";
+                        _logRepository.LogEntry(_homeHubSocket.HomeHubId, severity,
+                            string.Format("{0} changed to {1}", state.Name, state.Active ? "Active" : "Inactive"));
+                    }
                 }
 
                 _homeHubSocket.ChatHub.MessageToClients(states);

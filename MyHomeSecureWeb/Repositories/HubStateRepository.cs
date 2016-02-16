@@ -14,10 +14,16 @@ namespace MyHomeSecureWeb.Repositories
             return GetStateEntry(homeHubId, name).Active;
         }
 
-        public void SetState(string homeHubId, string name, bool state)
+        public bool SetState(string homeHubId, string name, bool state)
         {
-            GetStateEntry(homeHubId, name).Active = state;
-            db.SaveChanges();
+            var existing = GetStateEntry(homeHubId, name);
+            if (existing.Active != state)
+            {
+                existing.Active = state;
+                db.SaveChanges();
+                return true;
+            }
+            return false;
         }
         
         public void AddState(string homeHubId, string name)

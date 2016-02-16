@@ -10,6 +10,6 @@ namespace MyHomeSecureWeb.Repositories
         IQueryable<HubState> GetAllForHub(string homeHubId);
         bool GetState(string homeHubId, string name);
         void RemoveState(string homeHubId, string name);
-        void SetState(string homeHubId, string name, bool state);
+        bool SetState(string homeHubId, string name, bool state);
     }
 }
