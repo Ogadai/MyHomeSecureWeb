@@ -262,7 +262,7 @@
     <Compile Include="Models\MobileServiceContext.cs" />
     <Compile Include="Models\HubInitialise.cs" />
     <Compile Include="Models\SocketMessageBase.cs" />
-    <Compile Include="Models\UserTagged.cs" />
+    <Compile Include="Models\HubUserTagged.cs" />
     <Compile Include="Repositories\AwayStatusRepository.cs" />
     <Compile Include="Repositories\HomeHubRepository.cs" />
     <Compile Include="Repositories\HubStateRepository.cs" />

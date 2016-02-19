@@ -18,7 +18,7 @@ namespace MyHomeSecureWeb.WebSockets
             _homeHubSocket = homeHubSocket;
         }
 
-        public void ChangeStates(UserTagged userTagged)
+        public void UserTaggedHome(HubUserTagged userTagged)
         {
             if (!string.IsNullOrEmpty(_homeHubSocket.HomeHubId))
             {
