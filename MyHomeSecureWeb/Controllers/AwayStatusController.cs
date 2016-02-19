@@ -10,6 +10,7 @@ using System.Web.Http.Cors;
 using System;
 using MyHomeSecureWeb.Repositories;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Mobile.Service;
 
 namespace MyHomeSecureWeb.Controllers
 {
@@ -18,6 +19,8 @@ namespace MyHomeSecureWeb.Controllers
     [RequireHttps]
     public class AwayStatusController : ApiController
     {
+        public ApiServices Services { get; set; }
+
         private IAwayStatusRepository _awayStatusRepository = new AwayStatusRepository();
         private ILogRepository _logRepository = new LogRepository();
         private IPasswordHash _passwordHash = new PasswordHash();
@@ -40,12 +43,14 @@ namespace MyHomeSecureWeb.Controllers
                 var emailAddress = await _lookupToken.GetEmailAddress(this.User);
                 if (string.IsNullOrEmpty(emailAddress))
                 {
+                    Services.Log.Error("AwayStatus: No logged in user", null, "AwayStatus");
                     return Unauthorized();
                 }
 
-                var existingEntry = _awayStatusRepository.GetStatus(awayStatus.UserName);
+                var existingEntry = _awayStatusRepository.GetStatus(emailAddress);
                 if (existingEntry == null)
                 {
+                    Services.Log.Error(string.Format("AwayStatus: No status found for user '{0}'", emailAddress), null, "AwayStatus");
                     return NotFound();
                 }
 
@@ -57,17 +62,20 @@ namespace MyHomeSecureWeb.Controllers
                 var existingEntry = _awayStatusRepository.GetStatus(awayStatus.UserName);
                 if (existingEntry == null)
                 {
+                    Services.Log.Error(string.Format("AwayStatus: No status found for user '{0}'", awayStatus.UserName), null, "AwayStatus");
                     return NotFound();
                 }
 
                 if (string.IsNullOrEmpty(awayStatus.Token))
                 {
+                    Services.Log.Error("AwayStatus: Missing Token", null, "AwayStatus");
                     return Unauthorized();
                 }
 
                 var tokenHash = _passwordHash.Hash(awayStatus.Token, existingEntry.TokenSalt);
                 if (!tokenHash.SequenceEqual(existingEntry.TokenHash))
                 {
+                    Services.Log.Error(string.Format("AwayStatus: Invalid Token - {0}", awayStatus.Token), null, "AwayStatus");
                     return Unauthorized();
                 }
 
@@ -80,6 +88,7 @@ namespace MyHomeSecureWeb.Controllers
 
         private void UpdateAwayStatus(AwayStatus existingEntry, string awayStatusAction)
         {
+            Services.Log.Info(string.Format("User '{0}' {1}", existingEntry.UserName, awayStatusAction), null, "AwayStatus");
             var newAwayStatus = string.Equals(awayStatusAction, ActionExited, StringComparison.OrdinalIgnoreCase);
             if (newAwayStatus != existingEntry.Away)
             {

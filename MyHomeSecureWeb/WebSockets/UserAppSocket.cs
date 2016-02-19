@@ -1,4 +1,5 @@
-﻿using MyHomeSecureWeb.Models;
+﻿using Microsoft.WindowsAzure.Mobile.Service;
+using MyHomeSecureWeb.Models;
 using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
 using System;
@@ -12,7 +13,7 @@ namespace MyHomeSecureWeb.WebSockets
     {
         private ChatHub _chatHub;
 
-        public UserAppSocket(WebSocket socket, string homeHubId) : base(socket)
+        public UserAppSocket(WebSocket socket, ApiServices services, string homeHubId) : base(socket, services)
         {
             Debug.WriteLine("UserApp Conection opened");
 
@@ -50,6 +51,7 @@ namespace MyHomeSecureWeb.WebSockets
 
         public void Dispose()
         {
+            _chatHub.ClientMessage -= _chatHub_ClientMessage;
             _chatHub.Dispose();
         }
     }

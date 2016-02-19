@@ -1,4 +1,5 @@
-﻿using Microsoft.WindowsAzure.Mobile.Service.Security;
+﻿using Microsoft.WindowsAzure.Mobile.Service;
+using Microsoft.WindowsAzure.Mobile.Service.Security;
 using MyHomeSecureWeb.Utilities;
 using MyHomeSecureWeb.WebSockets;
 using System.Net;
@@ -17,6 +18,8 @@ namespace MyHomeSecureWeb.Controllers
     [RequireHttps]
     public class UserAppController : ApiController
     {
+        public ApiServices Services { get; set; }
+
         private ILookupToken _LookupToken = new LookupToken();
 
         [HttpGet]
@@ -37,7 +40,7 @@ namespace MyHomeSecureWeb.Controllers
             var homeHubId = await _LookupToken.GetHomeHubId(this.User);
 
             WebSocket socket = context.WebSocket;
-            using (var userAppSocket = new UserAppSocket(context.WebSocket, homeHubId))
+            using (var userAppSocket = new UserAppSocket(context.WebSocket, Services, homeHubId))
             {
                 await userAppSocket.Process();
             }

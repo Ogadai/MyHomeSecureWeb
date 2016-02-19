@@ -1,4 +1,5 @@
-﻿using MyHomeSecureWeb.Repositories;
+﻿using Microsoft.WindowsAzure.Mobile.Service;
+using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
 using System;
 using System.Diagnostics;
@@ -12,7 +13,7 @@ namespace MyHomeSecureWeb.WebSockets
         private CheckInOutMonitor _checkInOutMonitor;
         private ChatHub _chatHub;
 
-        public HomeHubSocket(WebSocket socket) : base(socket)
+        public HomeHubSocket(WebSocket socket, ApiServices services) : base(socket, services)
         {
             Debug.WriteLine("HomeHub Conection opened");
         }
@@ -42,8 +43,8 @@ namespace MyHomeSecureWeb.WebSockets
 
                 if (_chatHub != null)
                 {
-                    _chatHub.Dispose();
                     _chatHub.HomeMessage -= _chatHub_HomeMessage;
+                    _chatHub.Dispose();
                 }
 
                 _homeHubId = value;

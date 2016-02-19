@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Net.WebSockets;
 using MyHomeSecureWeb.Utilities;
 using MyHomeSecureWeb.WebSockets;
+using Microsoft.WindowsAzure.Mobile.Service;
 
 namespace MyHomeSecureWeb.Controllers
 {
@@ -17,6 +18,8 @@ namespace MyHomeSecureWeb.Controllers
     [RequireHttps]
     public class HomeHubController : ApiController
     {
+        public ApiServices Services { get; set; }
+
         [HttpGet]
         public HttpResponseMessage Get()
         {
@@ -34,7 +37,7 @@ namespace MyHomeSecureWeb.Controllers
         private async Task ProcessWSChat(AspNetWebSocketContext context)
         {
             WebSocket socket = context.WebSocket;
-            using (var homeHubSocket = new HomeHubSocket(context.WebSocket))
+            using (var homeHubSocket = new HomeHubSocket(context.WebSocket, Services))
             {
                 await homeHubSocket.Process();
             }

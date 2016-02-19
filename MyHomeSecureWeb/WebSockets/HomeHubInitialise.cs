@@ -98,10 +98,10 @@ namespace MyHomeSecureWeb.WebSockets
                     if (existingState != null)
                     {
                         hubStates.Remove(existingState);
-                        if (existingState.Active)
-                        {
-                            _hubStateRepository.SetState(homeHubId, existingState.Name, false);
-                        }
+                        //if (existingState.Active)
+                        //{
+                        //    _hubStateRepository.SetState(homeHubId, existingState.Name, false);
+                        //}
                     }
                     else
                     {

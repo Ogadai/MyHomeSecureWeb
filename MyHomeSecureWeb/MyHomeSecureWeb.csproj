@@ -262,6 +262,7 @@
     <Compile Include="Models\MobileServiceContext.cs" />
     <Compile Include="Models\HubInitialise.cs" />
     <Compile Include="Models\SocketMessageBase.cs" />
+    <Compile Include="Models\UserTagged.cs" />
     <Compile Include="Repositories\AwayStatusRepository.cs" />
     <Compile Include="Repositories\HomeHubRepository.cs" />
     <Compile Include="Repositories\HubStateRepository.cs" />
@@ -287,6 +288,7 @@
     <Compile Include="WebSockets\HomeHubInitialise.cs" />
     <Compile Include="WebSockets\HomeHubMessage.cs" />
     <Compile Include="WebSockets\HomeHubReconnect.cs" />
+    <Compile Include="WebSockets\HomeHubUserTaggedHome.cs" />
     <Compile Include="WebSockets\IHomeHubSocket.cs" />
     <Compile Include="WebSockets\ISocketSender.cs" />
     <Compile Include="WebSockets\ISocketTarget.cs" />

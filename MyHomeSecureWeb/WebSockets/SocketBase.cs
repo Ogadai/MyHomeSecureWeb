@@ -1,20 +1,24 @@
-﻿using MyHomeSecureWeb.Models;
+﻿using Microsoft.WindowsAzure.Mobile.Service;
+using MyHomeSecureWeb.Models;
 using Newtonsoft.Json;
 using System;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace MyHomeSecureWeb.WebSockets
 {
     public abstract class SocketBase
     {
         private WebSocket _socket;
+        private ApiServices _services;
 
-        public SocketBase(WebSocket socket)
+        public SocketBase(WebSocket socket, ApiServices services)
         {
             _socket = socket;
+            _services = services;
         }
 
         public async Task Process()
@@ -52,11 +56,17 @@ namespace MyHomeSecureWeb.WebSockets
                     var parameters = methodInfo.GetParameters();
                     if (parameters.Length > 0)
                     {
-                        var methodParams = new[]
-                        {
+                        try {
+                            var methodParams = new[]
+                            {
                             JsonConvert.DeserializeObject(message, parameters[0].ParameterType)
                         };
-                        methodInfo.Invoke(target, methodParams);
+                            methodInfo.Invoke(target, methodParams);
+                        }
+                        catch (Exception e)
+                        {
+                            _services.Log.Error(e, null, "Socket error");
+                        }
                     }
                 }
             }
