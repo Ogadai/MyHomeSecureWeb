@@ -29,7 +29,7 @@ namespace MyHomeSecureWeb.WebSockets
                     _awayStatusRepository.UpdateStatus(existingEntry.UserName, false);
                     CheckInOutMonitor.UserInOut(existingEntry.HomeHubId, existingEntry.UserName, false);
                     _logRepository.Priority(existingEntry.HomeHubId,
-                                string.Format("{0} entered with token", existingEntry.UserName));
+                                string.Format("{0} token", existingEntry.UserName));
                 }
 
                 _logRepository.Info(_homeHubSocket.HomeHubId, "");
