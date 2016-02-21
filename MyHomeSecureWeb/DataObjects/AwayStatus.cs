@@ -11,6 +11,8 @@ namespace MyHomeSecureWeb.DataObjects
         public byte[] TokenHash { get; set; }
         public byte[] TokenSalt { get; set; }
 
+        public string GoogleToken { get; set; }
+
         public string HomeHubId { get; set; }
         [ForeignKey("HomeHubId")]
         public virtual HomeHub HomeHub { get; set; }

@@ -3,6 +3,7 @@ using MyHomeSecureWeb.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace MyHomeSecureWeb.Repositories
 {
@@ -15,9 +16,20 @@ namespace MyHomeSecureWeb.Repositories
             return db.AwayStatus.SingleOrDefault(s => s.UserName == userName);
         }
 
+        public AwayStatus GetStatusFromGoogleToken(string token)
+        {
+            return db.AwayStatus.SingleOrDefault(s => s.GoogleToken == token);
+        }
+
         public void UpdateStatus(string userName, bool away)
         {
             db.AwayStatus.Single(s => s.UserName == userName).Away = away;
+            db.SaveChanges();
+        }
+
+        public void SetGoogleToken(string userName, string token)
+        {
+            db.AwayStatus.Single(s => s.UserName == userName).GoogleToken = token;
             db.SaveChanges();
         }
 

@@ -3,6 +3,7 @@ using MyHomeSecureWeb.DataObjects;
 using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
@@ -24,6 +25,11 @@ namespace MyHomeSecureWeb.Controllers
         public async Task<IHttpActionResult> GetLog(bool priority = true)
         {
             var hubId = await _lookupToken.GetHomeHubId(this.User);
+            if (string.IsNullOrEmpty(hubId))
+            {
+                return Unauthorized();
+            }
+
             return GetLogEntriesForHub(hubId, priority);
         }
 

@@ -1,9 +1,11 @@
 ﻿using Microsoft.WindowsAzure.Mobile.Service.Security;
 using MyHomeSecureWeb.Repositories;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Principal;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -41,11 +43,29 @@ namespace MyHomeSecureWeb.Utilities
         public async Task<string> GetHomeHubId(IPrincipal user)
         {
             var emailAddress = await GetEmailAddress(user);
-
-            using (var awayStatusRepository = new AwayStatusRepository())
+            if (emailAddress != null)
             {
-                var awayStatus = awayStatusRepository.GetStatus(emailAddress);
-                return awayStatus.HomeHubId;
+                using (var awayStatusRepository = new AwayStatusRepository())
+                {
+                    var awayStatus = awayStatusRepository.GetStatus(emailAddress);
+                    if (awayStatus != null)
+                    {
+                        return awayStatus.HomeHubId;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private void SetUserGoogleToken(string emailAddress, string token)
+        {
+            using (IAwayStatusRepository awayStatusRepository = new AwayStatusRepository())
+            {
+                var existingUser = awayStatusRepository.GetStatus(emailAddress);
+                if (existingUser != null)
+                {
+                    awayStatusRepository.SetGoogleToken(emailAddress, token);
+                }
             }
         }
 

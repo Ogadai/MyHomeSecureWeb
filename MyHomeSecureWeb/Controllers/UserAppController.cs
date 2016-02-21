@@ -2,6 +2,7 @@
 using Microsoft.WindowsAzure.Mobile.Service.Security;
 using MyHomeSecureWeb.Utilities;
 using MyHomeSecureWeb.WebSockets;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.WebSockets;
@@ -23,22 +24,26 @@ namespace MyHomeSecureWeb.Controllers
         private ILookupToken _LookupToken = new LookupToken();
 
         [HttpGet]
-        public HttpResponseMessage Get()
+        public async Task<HttpResponseMessage> Get()
         {
+            var homeHubId = await _LookupToken.GetHomeHubId(this.User);
+            if (string.IsNullOrEmpty(homeHubId))
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+            }
+
             HttpContext currentContext = HttpContext.Current;
             if (currentContext.IsWebSocketRequest ||
                 currentContext.IsWebSocketRequestUpgrading)
             {
-                currentContext.AcceptWebSocketRequest(ProcessWSChat);
+                currentContext.AcceptWebSocketRequest((context) => ProcessWSChat(context, homeHubId));
                 return Request.CreateResponse(HttpStatusCode.SwitchingProtocols);
             }
             return Request.CreateResponse(HttpStatusCode.NotFound);
         }
 
-        private async Task ProcessWSChat(AspNetWebSocketContext context)
+        private async Task ProcessWSChat(AspNetWebSocketContext context, string homeHubId)
         {
-            var homeHubId = await _LookupToken.GetHomeHubId(this.User);
-
             WebSocket socket = context.WebSocket;
             using (var userAppSocket = new UserAppSocket(context.WebSocket, Services, homeHubId))
             {
