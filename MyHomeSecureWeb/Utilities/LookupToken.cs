@@ -18,24 +18,31 @@ namespace MyHomeSecureWeb.Utilities
 
         public async Task<string> GetEmailAddress(IPrincipal user)
         {
-            var identities = await(user as ServiceUser).GetIdentitiesAsync();
-
-            //Check if the user has logged in using Google as Identity provider
-            var google = identities.OfType<GoogleCredentials>().FirstOrDefault();
-            if (google != null)
+            try
             {
-                var cachedEmail = GetEmailFromCache(google.AccessToken);
-                if (!string.IsNullOrEmpty(cachedEmail))
+                var identities = await (user as ServiceUser).GetIdentitiesAsync();
+
+                //Check if the user has logged in using Google as Identity provider
+                var google = identities.OfType<GoogleCredentials>().FirstOrDefault();
+                if (google != null)
                 {
-                    return cachedEmail;
+                    var cachedEmail = GetEmailFromCache(google.AccessToken);
+                    if (!string.IsNullOrEmpty(cachedEmail))
+                    {
+                        return cachedEmail;
+                    }
+
+                    var googleInfo = await GetProviderInfo(google.AccessToken);
+                    var userEmail = googleInfo.Value<string>("email");
+
+                    SetEmailInCache(google.AccessToken, userEmail);
+
+                    return userEmail;
                 }
-
-                var googleInfo = await GetProviderInfo(google.AccessToken);
-                var userEmail = googleInfo.Value<string>("email");
-
-                SetEmailInCache(google.AccessToken, userEmail);
-
-                return userEmail;
+            }
+            catch(HttpRequestException requestException)
+            {
+                // Swallow error and return null
             }
             return null;
         }
@@ -55,18 +62,6 @@ namespace MyHomeSecureWeb.Utilities
                 }
             }
             return null;
-        }
-
-        private void SetUserGoogleToken(string emailAddress, string token)
-        {
-            using (IAwayStatusRepository awayStatusRepository = new AwayStatusRepository())
-            {
-                var existingUser = awayStatusRepository.GetStatus(emailAddress);
-                if (existingUser != null)
-                {
-                    awayStatusRepository.SetGoogleToken(emailAddress, token);
-                }
-            }
         }
 
         private string GetEmailFromCache(string accessToken)

@@ -16,30 +16,21 @@ namespace MyHomeSecureWeb.Repositories
             return db.AwayStatus.SingleOrDefault(s => s.UserName == userName);
         }
 
-        public AwayStatus GetStatusFromGoogleToken(string token)
-        {
-            return db.AwayStatus.SingleOrDefault(s => s.GoogleToken == token);
-        }
-
         public void UpdateStatus(string userName, bool away)
         {
             db.AwayStatus.Single(s => s.UserName == userName).Away = away;
             db.SaveChanges();
         }
 
-        public void SetGoogleToken(string userName, string token)
+        public void SetToken(string userName, byte[] tokenHash, byte[] salt)
         {
-            db.AwayStatus.Single(s => s.UserName == userName).GoogleToken = token;
+            var user = db.AwayStatus.Single(s => s.UserName == userName);
+            user.TokenHash = tokenHash;
+            user.TokenSalt = salt;
             db.SaveChanges();
         }
 
-        public void SetToken(string userName, byte[] tokenHash)
-        {
-            db.AwayStatus.Single(s => s.UserName == userName).TokenHash = tokenHash;
-            db.SaveChanges();
-        }
-
-        public void AddUser(string userName, string homeHubId, byte[] tokenHash, byte[] salt)
+        public void AddUser(string userName, string homeHubId)
         {
             if (db.AwayStatus.SingleOrDefault(s => s.UserName == userName) != null)
             {
@@ -51,9 +42,7 @@ namespace MyHomeSecureWeb.Repositories
                 Id = Guid.NewGuid().ToString(),
                 HomeHubId = homeHubId,
                 UserName = userName,
-                Away = false,
-                TokenHash = tokenHash,
-                TokenSalt = salt
+                Away = false
             });
             db.SaveChanges();
         }

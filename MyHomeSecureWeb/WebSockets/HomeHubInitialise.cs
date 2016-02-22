@@ -64,12 +64,13 @@ namespace MyHomeSecureWeb.WebSockets
                 if (!string.IsNullOrEmpty(user.Name) && !string.IsNullOrEmpty(user.Token))
                 {
                     var existingUser = hubUsers.SingleOrDefault(u => u.UserName == user.Name);
-                    if (existingUser == null && _awayStatusRepository.GetStatus(user.Name) == null)
+                    if (existingUser != null)
                     {
-                        var salt = _passwordHash.CreateSalt(32);
-                        var tokenHash = _passwordHash.Hash(user.Token, salt);
-
-                        _awayStatusRepository.AddUser(user.Name, homeHubId, tokenHash, salt);
+                        hubUsers.Remove(existingUser);
+                    }
+                    else if (_awayStatusRepository.GetStatus(user.Name) == null)
+                    {
+                        _awayStatusRepository.AddUser(user.Name, homeHubId);
                     }
                 }
             }

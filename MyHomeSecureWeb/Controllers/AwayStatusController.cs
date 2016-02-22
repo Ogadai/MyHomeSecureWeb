@@ -43,14 +43,14 @@ namespace MyHomeSecureWeb.Controllers
                 var emailAddress = await _lookupToken.GetEmailAddress(this.User);
                 if (string.IsNullOrEmpty(emailAddress))
                 {
-                    Services.Log.Error("AwayStatus: No logged in user", null, "AwayStatus");
+                    Services.Log.Error("No logged in user", null, "AwayStatus");
                     return Unauthorized();
                 }
 
                 var existingEntry = _awayStatusRepository.GetStatus(emailAddress);
                 if (existingEntry == null)
                 {
-                    Services.Log.Error(string.Format("AwayStatus: No status found for user '{0}'", emailAddress), null, "AwayStatus");
+                    Services.Log.Error(string.Format("No status found for user '{0}'", emailAddress), null, "AwayStatus");
                     return NotFound();
                 }
 
@@ -58,37 +58,24 @@ namespace MyHomeSecureWeb.Controllers
             }
             else
             {
-                AwayStatus existingEntry = null;
-                if (string.IsNullOrEmpty(awayStatus.UserName))
+                AwayStatus existingEntry = existingEntry = _awayStatusRepository.GetStatus(awayStatus.UserName);
+                if (existingEntry == null)
                 {
-                    existingEntry = _awayStatusRepository.GetStatusFromGoogleToken(awayStatus.Token);
-                    if (existingEntry == null)
-                    {
-                        Services.Log.Error(string.Format("AwayStatus: No status found for google token '{0}'", awayStatus.Token), null, "AwayStatus");
-                        return NotFound();
-                    }
+                    Services.Log.Error(string.Format("No status found for user '{0}'", awayStatus.UserName), null, "AwayStatus");
+                    return NotFound();
                 }
-                else
+
+                if (string.IsNullOrEmpty(awayStatus.Token))
                 {
-                    existingEntry = _awayStatusRepository.GetStatus(awayStatus.UserName);
-                    if (existingEntry == null)
-                    {
-                        Services.Log.Error(string.Format("AwayStatus: No status found for user '{0}'", awayStatus.UserName), null, "AwayStatus");
-                        return NotFound();
-                    }
+                    Services.Log.Error("Missing Token", null, "AwayStatus");
+                    return Unauthorized();
+                }
 
-                    if (string.IsNullOrEmpty(awayStatus.Token))
-                    {
-                        Services.Log.Error("AwayStatus: Missing Token", null, "AwayStatus");
-                        return Unauthorized();
-                    }
-
-                    var tokenHash = _passwordHash.Hash(awayStatus.Token, existingEntry.TokenSalt);
-                    if (!tokenHash.SequenceEqual(existingEntry.TokenHash))
-                    {
-                        Services.Log.Error(string.Format("AwayStatus: Invalid Token - {0}", awayStatus.Token), null, "AwayStatus");
-                        return Unauthorized();
-                    }
+                var tokenHash = _passwordHash.Hash(awayStatus.Token, existingEntry.TokenSalt);
+                if (!tokenHash.SequenceEqual(existingEntry.TokenHash))
+                {
+                    Services.Log.Error(string.Format("Invalid Token - {0}", awayStatus.Token), null, "AwayStatus");
+                    return Unauthorized();
                 }
 
                 UpdateAwayStatus(existingEntry, awayStatus.Action);

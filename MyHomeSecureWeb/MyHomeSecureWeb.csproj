@@ -249,12 +249,14 @@
     <Compile Include="Controllers\AwayStatusController.cs" />
     <Compile Include="Controllers\HomeHubController.cs" />
     <Compile Include="Controllers\LogController.cs" />
+    <Compile Include="Controllers\SetupTokenController.cs" />
     <Compile Include="Controllers\TodoItemController.cs" />
     <Compile Include="Controllers\UserAppController.cs" />
     <Compile Include="DataObjects\AwayStatus.cs" />
     <Compile Include="DataObjects\HomeHub.cs" />
     <Compile Include="DataObjects\HubState.cs" />
     <Compile Include="DataObjects\LogEntry.cs" />
+    <Compile Include="DataObjects\SetupToken.cs" />
     <Compile Include="DataObjects\TodoItem.cs" />
     <Compile Include="Models\HubAwayStatus.cs" />
     <Compile Include="Models\HubChangeState.cs" />

@@ -7,11 +7,9 @@ namespace MyHomeSecureWeb.Repositories
     public interface IAwayStatusRepository: IDisposable
     {
         AwayStatus GetStatus(string userName);
-        AwayStatus GetStatusFromGoogleToken(string token);
         void UpdateStatus(string userName, bool away);
-        void SetGoogleToken(string userName, string token);
-        void SetToken(string userName, byte[] tokenHash);
-        void AddUser(string userName, string homeHubId, byte[] tokenHash, byte[] salt);
+        void SetToken(string userName, byte[] tokenHash, byte[] salt);
+        void AddUser(string userName, string homeHubId);
         void RemoveUser(string userName);
         IQueryable<AwayStatus> GetAllForHub(string homeHubId);
     }
