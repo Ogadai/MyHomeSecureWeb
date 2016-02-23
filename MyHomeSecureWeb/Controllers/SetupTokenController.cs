@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Mobile.Service;
 using Microsoft.WindowsAzure.Mobile.Service.Security;
 using MyHomeSecureWeb.DataObjects;
+using MyHomeSecureWeb.Models;
 using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
 using System.Threading.Tasks;

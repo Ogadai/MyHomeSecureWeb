@@ -1,4 +1,4 @@
-﻿namespace MyHomeSecureWeb.DataObjects
+﻿namespace MyHomeSecureWeb.Models
 {
     public class SetupTokenResponse
     {

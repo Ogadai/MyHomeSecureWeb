@@ -13,6 +13,10 @@ namespace MyHomeSecureWeb.Repositories
         {
             return db.HomeHubs.SingleOrDefault(h => h.Name == name);
         }
+        public HomeHub GetHubById(string id)
+        {
+            return db.HomeHubs.SingleOrDefault(h => h.Id == id);
+        }
 
         public HomeHub AddHub(string name, byte[] tokenHash, byte[] salt)
         {
@@ -28,6 +32,17 @@ namespace MyHomeSecureWeb.Repositories
             db.SaveChanges();
 
             return newHub;
+        }
+
+        public void SetLocation(string homeHubId, double latitude, double longitude, float radius)
+        {
+            var hub = db.HomeHubs.Single(h => h.Id == homeHubId);
+
+            hub.Latitude = latitude;
+            hub.Longitude = longitude;
+            hub.Radius = radius;
+
+            db.SaveChanges();
         }
 
         public void Dispose()

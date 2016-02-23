@@ -10,6 +10,10 @@ namespace MyHomeSecureWeb.DataObjects
         public byte[] TokenHash { get; set; }
         public byte[] TokenSalt { get; set; }
 
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public float Radius { get; set; }
+
         public virtual ICollection<AwayStatus> AwayStatus { get; set; }
         public virtual ICollection<LogEntry> LogEntries { get; set; }
         public virtual ICollection<HubState> States { get; set; }

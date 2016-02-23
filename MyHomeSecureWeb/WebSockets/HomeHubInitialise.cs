@@ -48,6 +48,9 @@ namespace MyHomeSecureWeb.WebSockets
                 hub = _homeHubRepository.AddHub(request.Name, tokenHash, salt);
             }
 
+            // Update the location parameters
+            _homeHubRepository.SetLocation(hub.Id, request.Latitude, request.Longitude, request.Radius);
+
             InitialiseUsers(hub.Id, request.Users);
             InitialiseStates(hub.Id, request.States);
 

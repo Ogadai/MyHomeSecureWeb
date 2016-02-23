@@ -108,7 +108,7 @@ namespace MyHomeSecureWeb.WebSockets
             {
                 using (var logRepository = new LogRepository())
                 {
-                    logRepository.Info(HomeHubId, message);
+                    logRepository.Priority(HomeHubId, message);
                 }
             }
         }
