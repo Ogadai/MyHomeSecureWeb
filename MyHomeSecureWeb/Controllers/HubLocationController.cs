@@ -23,8 +23,10 @@ namespace MyHomeSecureWeb.Controllers
         // GET: api/HubLocation
         [HttpGet]
         [ResponseType(typeof(HubLocation))]
-        public async Task<IHttpActionResult> GetLocation()
+        public async Task<IHttpActionResult> GetHubLocation()
         {
+            Services.Log.Info("Getting hub location");
+
             var hubId = await _lookupToken.GetHomeHubId(this.User);
             if (string.IsNullOrEmpty(hubId))
             {
@@ -32,7 +34,7 @@ namespace MyHomeSecureWeb.Controllers
                 return Unauthorized();
             }
 
-            var hub = _homeHubRepository.GetHub(hubId);
+            var hub = _homeHubRepository.GetHubById(hubId);
 
             return Ok(new HubLocation {
                 Latitude = hub.Latitude,

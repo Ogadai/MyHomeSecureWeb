@@ -10,7 +10,7 @@ using System.Web.Http.Cors;
 
 namespace MyHomeSecureWeb.Controllers
 {
-    [AuthorizeLevel(AuthorizationLevel.Anonymous)]
+    [AuthorizeLevel(AuthorizationLevel.User)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RequireHttps]
     public class LogController : ApiController
@@ -21,7 +21,6 @@ namespace MyHomeSecureWeb.Controllers
         private ILookupToken _lookupToken = new LookupToken();
 
         // GET api/log
-        [AuthorizeLevel(AuthorizationLevel.User)]
         public async Task<IHttpActionResult> GetLog(bool priority = true)
         {
             var hubId = await _lookupToken.GetHomeHubId(this.User);
