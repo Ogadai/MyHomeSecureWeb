@@ -251,6 +251,7 @@
     <Compile Include="Controllers\HubLocationController.cs" />
     <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\SetupTokenController.cs" />
+    <Compile Include="Controllers\TestPushController.cs" />
     <Compile Include="Controllers\TodoItemController.cs" />
     <Compile Include="Controllers\UserAppController.cs" />
     <Compile Include="DataObjects\AwayStatus.cs" />
@@ -267,6 +268,9 @@
     <Compile Include="Models\HubInitialise.cs" />
     <Compile Include="Models\SocketMessageBase.cs" />
     <Compile Include="Models\HubUserTagged.cs" />
+    <Compile Include="Notifications\IStateNotification.cs" />
+    <Compile Include="Notifications\StatusMessage.cs" />
+    <Compile Include="Notifications\StateNotification.cs" />
     <Compile Include="Repositories\AwayStatusRepository.cs" />
     <Compile Include="Repositories\HomeHubRepository.cs" />
     <Compile Include="Repositories\HubStateRepository.cs" />

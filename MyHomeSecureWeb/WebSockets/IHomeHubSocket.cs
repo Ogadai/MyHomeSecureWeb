@@ -1,4 +1,5 @@
 ﻿using MyHomeSecureWeb.Utilities;
+using System;
 
 namespace MyHomeSecureWeb.WebSockets
 {

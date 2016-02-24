@@ -21,6 +21,13 @@ namespace MyHomeSecureWeb.WebSockets
             _services = services;
         }
 
+        public ApiServices Services {
+            get
+            {
+                return _services;
+            }
+        }
+
         public async Task Process()
         {
             ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[1024]);
