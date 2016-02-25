@@ -1,10 +1,10 @@
 ﻿using MyHomeSecureWeb.DataObjects;
+using System;
 
 namespace MyHomeSecureWeb.Repositories
 {
-    public interface IHomeHubRepository
+    public interface IHomeHubRepository : IDisposable
     {
-        void Dispose();
         HomeHub GetHub(string name);
         HomeHub GetHubById(string id);
         HomeHub AddHub(string name, byte[] tokenHash, byte[] salt);

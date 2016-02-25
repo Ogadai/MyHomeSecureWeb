@@ -34,7 +34,7 @@ namespace MyHomeSecureWeb.Notifications
 
             try
             {
-                var result = await _services.Push.SendAsync(message, "my-test-tag");
+                var result = await _services.Push.SendAsync(message, homeHubId);
                 _services.Log.Info(result.State.ToString());
             }
             catch (Exception ex)

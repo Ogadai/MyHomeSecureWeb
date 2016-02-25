@@ -37,6 +37,7 @@ namespace MyHomeSecureWeb.Controllers
             var hub = _homeHubRepository.GetHubById(hubId);
 
             return Ok(new HubLocation {
+                HubId = hub.Id,
                 Latitude = hub.Latitude,
                 Longitude = hub.Longitude,
                 Radius = hub.Radius
