@@ -247,6 +247,8 @@
     <Compile Include="App_Start\UnityResolver.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AwayStatusController.cs" />
+    <Compile Include="Controllers\CameraController.cs" />
+    <Compile Include="Controllers\CameraStreamController.cs" />
     <Compile Include="Controllers\HomeHubController.cs" />
     <Compile Include="Controllers\HubLocationController.cs" />
     <Compile Include="Controllers\LogController.cs" />
@@ -258,6 +260,8 @@
     <Compile Include="DataObjects\HomeHub.cs" />
     <Compile Include="DataObjects\HubState.cs" />
     <Compile Include="DataObjects\LogEntry.cs" />
+    <Compile Include="Models\CameraInitialiseRequest.cs" />
+    <Compile Include="Models\HubCameraCommand.cs" />
     <Compile Include="Models\HubLocation.cs" />
     <Compile Include="Models\SetupToken.cs" />
     <Compile Include="DataObjects\TodoItem.cs" />
@@ -291,12 +295,16 @@
     <Compile Include="Utilities\LookupToken.cs" />
     <Compile Include="Utilities\PasswordHash.cs" />
     <Compile Include="Utilities\RequireHttpsAttribute.cs" />
+    <Compile Include="Utilities\VideoHub.cs" />
+    <Compile Include="WebSockets\CameraInitialise.cs" />
+    <Compile Include="WebSockets\CameraSocket.cs" />
     <Compile Include="WebSockets\HomeHubAwayChange.cs" />
     <Compile Include="WebSockets\HomeHubChangeStates.cs" />
     <Compile Include="WebSockets\HomeHubInitialise.cs" />
     <Compile Include="WebSockets\HomeHubMessage.cs" />
     <Compile Include="WebSockets\HomeHubReconnect.cs" />
     <Compile Include="WebSockets\HomeHubUserTaggedHome.cs" />
+    <Compile Include="WebSockets\ICameraSocket.cs" />
     <Compile Include="WebSockets\IHomeHubSocket.cs" />
     <Compile Include="WebSockets\ISocketSender.cs" />
     <Compile Include="WebSockets\ISocketTarget.cs" />

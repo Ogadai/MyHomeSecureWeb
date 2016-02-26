@@ -37,10 +37,7 @@ namespace MyHomeSecureWeb.WebSockets
                     buffer, CancellationToken.None);
                 if (_socket.State == WebSocketState.Open)
                 {
-                    string message = Encoding.UTF8.GetString(
-                        buffer.Array, 0, result.Count);
-
-                    ReceivedMessage(message);
+                    OnReceived(buffer.Array, result.Count);
                 }
                 else
                 {
@@ -49,11 +46,19 @@ namespace MyHomeSecureWeb.WebSockets
             }
         }
 
-        public void ReceivedMessage(string message)
+        protected virtual void OnReceived(byte[] bytes, int length)
+        {
+            string message = Encoding.UTF8.GetString(bytes, 0, length);
+            ReceivedMessage(message);
+        }
+
+        private void ReceivedMessage(string message)
         {
             var decoded = JsonConvert.DeserializeObject<SocketMessageBase>(message);
 
-            var targetName = string.Format("MyHomeSecureWeb.WebSockets.HomeHub{0}", decoded.Method);
+            var currentTypeName = this.GetType().FullName;
+            var baseTypeName = currentTypeName.Substring(0, currentTypeName.LastIndexOf("Socket"));
+            var targetName = string.Format("{0}{1}", baseTypeName, decoded.Method);
             var target = CreateMessageInstance(Type.GetType(targetName));
             using (target)
             {
