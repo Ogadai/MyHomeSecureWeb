@@ -248,6 +248,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AwayStatusController.cs" />
     <Compile Include="Controllers\CameraController.cs" />
+    <Compile Include="Controllers\CameraSnapshotController.cs" />
     <Compile Include="Controllers\CameraStreamController.cs" />
     <Compile Include="Controllers\HomeHubController.cs" />
     <Compile Include="Controllers\HubLocationController.cs" />

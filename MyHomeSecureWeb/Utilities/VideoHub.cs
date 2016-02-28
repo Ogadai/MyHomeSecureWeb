@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MyHomeSecureWeb.Models;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MyHomeSecureWeb.Utilities
@@ -23,7 +25,7 @@ namespace MyHomeSecureWeb.Utilities
                     videoHub = _instances[streamId];
                 }
                 else {
-                    videoHub = new VideoHub(streamId);
+                    videoHub = new VideoHub(streamId, homeHubId, node);
                     _instances[streamId] = videoHub;
                 }
 
@@ -37,11 +39,27 @@ namespace MyHomeSecureWeb.Utilities
             return string.Format("{0}|{1}", homeHubId, node);
         }
 
+        private string _streamId;
+        private string _nodeName;
+        private int _refCount;
+        private ChatHub _chatHub;
+
+        private DateTime _lastRequested = DateTime.MinValue;
+
+        private VideoHub(string streamId, string homeHubId, string nodeName)
+        {
+            _streamId = streamId;
+            _nodeName = nodeName;
+            _refCount = 0;
+            _chatHub = ChatHub.Get(homeHubId);
+        }
+
         public void ReceivedData(byte[] bytes, int length)
         {
             if (OnData != null)
             {
-                OnData(new VideoHubData {
+                OnData(new VideoHubData
+                {
                     Bytes = bytes,
                     Length = length
                 });
@@ -55,15 +73,6 @@ namespace MyHomeSecureWeb.Utilities
             }
         }
 
-        private string _streamId;
-        private int _refCount;
-
-        private VideoHub(string streamId)
-        {
-            _streamId= streamId;
-            _refCount = 0;
-        }
-
         private void AddRef()
         {
             _refCount++;
@@ -75,6 +84,7 @@ namespace MyHomeSecureWeb.Utilities
             if (_refCount == 0)
             {
                 _instances.Remove(_streamId);
+                _chatHub.Dispose();
             }
         }
     }

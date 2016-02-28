@@ -32,6 +32,7 @@ namespace MyHomeSecureWeb.Controllers
             {
                 Content = new PushStreamContent(async (outputStream, httpContent, transportContext) =>
                 {
+                    Services.Log.Info(string.Format("Requesting camera stream from {0} - {1}", node, hubId));
                     using (var chatHub = ChatHub.Get(hubId))
                     {
                         chatHub.MessageToHome(new HubCameraCommand
@@ -82,7 +83,7 @@ namespace MyHomeSecureWeb.Controllers
                             });
                         }
                     }
-                }, new MediaTypeHeaderValue("video/h264")) // "text/plain"
+                }, new MediaTypeHeaderValue("video/webm")) // "text/plain"
             };
 
             return Task.FromResult(response);
