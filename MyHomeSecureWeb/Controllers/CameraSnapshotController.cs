@@ -121,7 +121,8 @@ namespace MyHomeSecureWeb.Controllers
                 _chatHub.MessageToHome(new HubCameraCommand
                 {
                     Node = _node,
-                    Active = true
+                    Active = true,
+                    Type = "timelapse"
                 });
             }
 
@@ -137,7 +138,8 @@ namespace MyHomeSecureWeb.Controllers
                     _chatHub.MessageToHome(new HubCameraCommand
                     {
                         Node = _node,
-                        Active = false
+                        Active = false,
+                        Type = "timelapse"
                     });
                 });
             }
@@ -149,7 +151,7 @@ namespace MyHomeSecureWeb.Controllers
                 {
                     new Thread(new ThreadStart(() =>
                     {
-                        Thread.Sleep(5000);
+                        Thread.Sleep(10000);
                         if (!Cancelled)
                         {
                             callback();

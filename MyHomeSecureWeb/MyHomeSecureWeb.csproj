@@ -257,6 +257,7 @@
     <Compile Include="Controllers\TestPushController.cs" />
     <Compile Include="Controllers\TodoItemController.cs" />
     <Compile Include="Controllers\UploadSnapshotController.cs" />
+    <Compile Include="Controllers\UploadStreamController.cs" />
     <Compile Include="Controllers\UserAppController.cs" />
     <Compile Include="DataObjects\AwayStatus.cs" />
     <Compile Include="DataObjects\HomeHub.cs" />

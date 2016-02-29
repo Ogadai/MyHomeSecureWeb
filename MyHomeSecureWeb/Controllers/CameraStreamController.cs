@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Mobile.Service;
 using Microsoft.WindowsAzure.Mobile.Service.Security;
 using MyHomeSecureWeb.Models;
+using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
 using System;
 using System.Collections.Generic;
@@ -24,9 +25,20 @@ namespace MyHomeSecureWeb.Controllers
         public ApiServices Services { get; set; }
 
         [HttpGet]
-        public Task<HttpResponseMessage> Get(string node)
+        public async Task<HttpResponseMessage> Get(string hubName, string node)
         {
-            string hubId = "2fc81f9e-7ba6-4869-8346-6130942f1c7a"; // "74d1192d-d369-465b-a17b-99f47c28c58d";
+
+            string hubId = null;
+            using (var hubRepository = new HomeHubRepository())
+            {
+                var hub = hubRepository.GetHub(hubName);
+                if (hub == null)
+                {
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                }
+
+                hubId = hub.Id;
+            }
 
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
@@ -38,7 +50,8 @@ namespace MyHomeSecureWeb.Controllers
                         chatHub.MessageToHome(new HubCameraCommand
                         {
                             Node = node,
-                            Active = true
+                            Active = true,
+                            Type = "h264"
                         });
 
                         try
@@ -79,14 +92,15 @@ namespace MyHomeSecureWeb.Controllers
                             chatHub.MessageToHome(new HubCameraCommand
                             {
                                 Node = node,
-                                Active = false
+                                Active = false,
+                                Type = "h264"
                             });
                         }
                     }
                 }, new MediaTypeHeaderValue("video/webm")) // "text/plain"
             };
 
-            return Task.FromResult(response);
+            return response;
         }
     }
 }
