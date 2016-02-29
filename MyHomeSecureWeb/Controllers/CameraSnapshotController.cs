@@ -5,7 +5,6 @@ using MyHomeSecureWeb.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -17,47 +16,32 @@ using System.Web.Http.Cors;
 
 namespace MyHomeSecureWeb.Controllers
 {
-    [AuthorizeLevel(AuthorizationLevel.Anonymous)]
+    [AuthorizeLevel(AuthorizationLevel.User)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RequireHttps]
     public class CameraSnapshotController : ApiController
     {
         public ApiServices Services { get; set; }
 
+        private ILookupToken _lookupToken = new LookupToken();
+
         [HttpGet]
-        public Task<HttpResponseMessage> Get(string hub, string node)
+        public async Task<HttpResponseMessage> Get(string node)
         {
+            string hubId = await _lookupToken.GetHomeHubId(User);
+            if (string.IsNullOrEmpty(hubId))
+            {
+                Services.Log.Error("No logged in user", null, "CameraSnapshot");
+                return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            }
+
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new PushStreamContent(async (outputStream, httpContent, transportContext) =>
                 {
                     try
                     {
-                        CameraActivator.Trigger(hub, node);
-                        using (var videoHub = VideoHub.Get(hub, node))
-                        {
-                            using (var videoWaitable = new VideoHubWaitable(videoHub))
-                            {
-                                var moreData = true;
-                                var imageSize = 0;
-                                while (moreData)
-                                {
-                                    var videoData = await videoWaitable.WaitData();
-
-                                    if (videoData.Length != 0 &&
-                                            !(videoData.Length == 1 && videoData.Bytes[0] == 0))
-                                    {
-                                        await outputStream.WriteAsync(videoData.Bytes, 0, videoData.Length);
-                                        imageSize += videoData.Length;
-                                    }
-                                    else
-                                    {
-                                        moreData = false;
-                                    }
-                                }
-                                Services.Log.Info(string.Format("Sent camera snapshot with {0} bytes", imageSize));
-                            }
-                        }
+                        await PipeSnapshotImage(hubId, node, outputStream);
                     }
                     catch (HttpException ex)
                     {
@@ -74,7 +58,37 @@ namespace MyHomeSecureWeb.Controllers
                 }, new MediaTypeHeaderValue("image/jpeg"))
             };
 
-            return Task.FromResult(response);
+            return response;
+        }
+
+        private async Task TestSnapshotImage(string hubId, string node, Stream outputStream)
+        {
+            var filePath = HttpContext.Current.Server.MapPath(@"~/test.jpg");
+            var filePath2 = @"D:\home\site\wwwroot\test.jpg";
+            byte[] videoData = File.ReadAllBytes(filePath2);
+
+            await outputStream.WriteAsync(videoData, 0, videoData.Length);
+        }
+
+        private async Task PipeSnapshotImage(string hubId, string node, Stream outputStream)
+        {
+            CameraActivator.Trigger(hubId, node);
+            using (var videoHub = VideoHub.Get(hubId, node))
+            {
+                using (var videoWaitable = new VideoHubWaitable(videoHub))
+                {
+                    var imageSize = 0;
+                    var videoData = await videoWaitable.WaitData();
+
+                    if (videoData.Length != 0 &&
+                            !(videoData.Length == 1 && videoData.Bytes[0] == 0))
+                    {
+                        await outputStream.WriteAsync(videoData.Bytes, 0, videoData.Length);
+                        imageSize += videoData.Length;
+                    }
+                    Services.Log.Info(string.Format("Sent camera snapshot with {0} bytes", imageSize));
+                }
+            }
         }
 
         private class CameraActivator

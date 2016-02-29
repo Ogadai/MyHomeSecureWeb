@@ -256,6 +256,7 @@
     <Compile Include="Controllers\SetupTokenController.cs" />
     <Compile Include="Controllers\TestPushController.cs" />
     <Compile Include="Controllers\TodoItemController.cs" />
+    <Compile Include="Controllers\UploadSnapshotController.cs" />
     <Compile Include="Controllers\UserAppController.cs" />
     <Compile Include="DataObjects\AwayStatus.cs" />
     <Compile Include="DataObjects\HomeHub.cs" />
@@ -315,6 +316,9 @@
     <Compile Include="WebSockets\UserAppSocket.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="test.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
