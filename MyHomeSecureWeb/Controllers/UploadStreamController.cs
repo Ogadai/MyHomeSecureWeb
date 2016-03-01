@@ -44,6 +44,7 @@ namespace MyHomeSecureWeb.Controllers
             {
                 var requestStream = new RequestStream(homeHub.Id, node);
                 await Request.Content.CopyToAsync(requestStream);
+                requestStream.Close();
             }
 
             return Ok();
@@ -130,15 +131,8 @@ namespace MyHomeSecureWeb.Controllers
 
             public override void Write(byte[] buffer, int offset, int count)
             {
-                if (offset != 0)
-                {
-                    var copy = buffer.Skip(offset).ToArray();
-                    _videoHub.ReceivedData(copy, count);
-                }
-                else
-                {
-                    _videoHub.ReceivedData(buffer, count);
-                }
+                var copy = buffer.Skip(offset).ToArray();
+                _videoHub.ReceivedData(copy, count);
             }
 
             public override void Close()
@@ -146,6 +140,7 @@ namespace MyHomeSecureWeb.Controllers
                 base.Close();
                 if (_videoHub != null)
                 {
+                    _videoHub.Closed();
                     _videoHub.Dispose();
                     _videoHub = null;
                 }

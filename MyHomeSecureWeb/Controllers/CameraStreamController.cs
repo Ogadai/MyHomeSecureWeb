@@ -5,6 +5,7 @@ using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -56,6 +57,7 @@ namespace MyHomeSecureWeb.Controllers
 
                         try
                         {
+                            var totalData = 0;
                             using (var videoHub = VideoHub.Get(hubId, node))
                             {
                                 using (var videoWaitable = new VideoHubWaitable(videoHub))
@@ -67,6 +69,8 @@ namespace MyHomeSecureWeb.Controllers
 
                                         if (videoData.Length != 0)
                                         {
+                                            totalData += videoData.Length;
+                                            Debug.WriteLine(string.Format("uploaded: {0}", totalData));
                                             await outputStream.WriteAsync(videoData.Bytes, 0, videoData.Length);
                                         }
                                         else

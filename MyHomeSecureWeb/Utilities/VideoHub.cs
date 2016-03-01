@@ -97,7 +97,7 @@ namespace MyHomeSecureWeb.Utilities
         public VideoHubWaitable(VideoHub videoHub)
         {
             _videoHub = videoHub;
-            _dataCompletion = new TaskCompletionSource<VideoHubData>();
+            Push();
 
             _videoHub.OnData += _videoHub_OnData;
             _videoHub.OnClosed += _videoHub_OnClosed;
@@ -105,17 +105,17 @@ namespace MyHomeSecureWeb.Utilities
 
         private void _videoHub_OnData(VideoHubData data)
         {
-            _dataCompletion.TrySetResult(data);
+            Push(data);
         }
         private void _videoHub_OnClosed()
         {
-            _dataCompletion.TrySetResult(new VideoHubData { Length = 0 });
+            Push(new VideoHubData { Length = 0 });
         }
 
         public async Task<VideoHubData> WaitData()
         {
-            VideoHubData data = await _dataCompletion.Task;
-            _dataCompletion = new TaskCompletionSource<VideoHubData>();
+            VideoHubData data = await First().Task;
+            Pop();
             return data;
         }
 
@@ -124,6 +124,33 @@ namespace MyHomeSecureWeb.Utilities
             _videoHub.OnData -= _videoHub_OnData;
             _videoHub.OnClosed -= _videoHub_OnClosed;
             _videoHub.Dispose();
+        }
+
+        private List<TaskCompletionSource<VideoHubData>> mList = new List<TaskCompletionSource<VideoHubData>>();
+        private void Push(VideoHubData data = null)
+        {
+            lock(_videoHub)
+            {
+                if (data != null && mList.Count > 0)
+                {
+                    mList[mList.Count - 1].TrySetResult(data);
+                }
+                mList.Add(new TaskCompletionSource<VideoHubData>());
+            }
+        }
+        private TaskCompletionSource<VideoHubData> First()
+        {
+            lock(_videoHub)
+            {
+                return mList[0];
+            }
+        }
+        private void Pop()
+        {
+            lock(_videoHub)
+            {
+                mList.RemoveAt(0);
+            }
         }
     }
 
