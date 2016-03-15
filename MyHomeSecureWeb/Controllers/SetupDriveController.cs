@@ -11,6 +11,7 @@ using System.Web.Configuration;
 using System.Web.Http;
 using Newtonsoft.Json;
 using MyHomeSecureWeb.Models;
+using MyHomeSecureWeb.Repositories;
 
 namespace MyHomeSecureWeb.Controllers
 {
@@ -30,14 +31,28 @@ namespace MyHomeSecureWeb.Controllers
         private const string _tokenExchangeBodyTemplate = "grant_type=authorization_code&code={0}&redirect_uri={1}&client_id={2}&client_secret={3}";
         private const string _scope = "https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email";
 
+        private static string GetClientId()
+        {
+            return WebConfigurationManager.AppSettings["ClientId"];
+        }
+        private static string GetClientSecret()
+        {
+            return WebConfigurationManager.AppSettings["ClientSecret"];
+        }
+
         [HttpGet]
         [Route("api/setupdrive", Name = "SetupDrive")]
         public IHttpActionResult SetupDrive()
         {
-            var clientId = WebConfigurationManager.AppSettings["ClientId"];
-
-            var redirect = string.Format(_authUrlTemplate, _scope, GetStateString(), GetReturnUrlEnq(), clientId, _randGet.Next(1000));
+            var redirect = string.Format(_authUrlTemplate, _scope, GetStateString(), GetReturnUrlEnq(), GetClientId(), _randGet.Next(1000));
             return Redirect(redirect);
+        }
+
+        [HttpGet]
+        [Route("api/setupdrive/test")]
+        public IHttpActionResult Test()
+        {
+            return new HtmlActionResult("SetupDriveSuccess", new { UserName = "test@test.com" });
         }
 
         [HttpGet]
@@ -67,17 +82,24 @@ namespace MyHomeSecureWeb.Controllers
             {
                 var emailAddress = await GetUserEmail(token.AccessToken);
 
-                return Ok(emailAddress);
+                if (CheckUserExists(emailAddress))
+                {
+                    // Store the tokens
+                    await StoreDriveTokens(emailAddress, token.AccessToken, token.RefreshToken);
+
+                    return new HtmlActionResult("SetupDriveSuccess", new { UserName = emailAddress });
+                }
+                else
+                {
+                    return new HtmlActionResult("SetupDriveNotFound", new { UserName = emailAddress });
+                }
             }
         }
 
         private async Task<GoogleAccessToken> GetAccessToken(string code)
         {
-            var clientId = WebConfigurationManager.AppSettings["ClientId"];
-            var clientSecret = WebConfigurationManager.AppSettings["ClientSecret"];
-
             var returnUrl = Url.Link("SetupDriveCode", new { });
-            var postData = string.Format(_tokenExchangeBodyTemplate, code, GetReturnUrlEnq(), clientId, clientSecret);
+            var postData = string.Format(_tokenExchangeBodyTemplate, code, GetReturnUrlEnq(), GetClientId(), GetClientSecret());
             var byteArray = Encoding.UTF8.GetBytes(postData);
 
             // Get the response
@@ -129,7 +151,22 @@ namespace MyHomeSecureWeb.Controllers
                     return userInfo.Email;
                 }
             }
+        }
 
+        private bool CheckUserExists(string emailAddress)
+        {
+            using (IAwayStatusRepository awayStatusRepository = new AwayStatusRepository())
+            {
+                return awayStatusRepository.GetStatus(emailAddress) != null;
+            }
+        }
+
+        private async Task StoreDriveTokens(string emailAddress, string accessToken, string refreshToken)
+        {
+            using (IAwayStatusRepository awayStatusRepository = new AwayStatusRepository())
+            {
+                await awayStatusRepository.SetDriveTokensAsync(emailAddress, accessToken, refreshToken);
+            }
         }
 
         private string GetReturnUrlEnq()

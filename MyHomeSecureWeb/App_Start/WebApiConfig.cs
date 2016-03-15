@@ -9,6 +9,7 @@ using System.Net.Http.Headers;
 using MyHomeSecureWeb.Utilities;
 using Microsoft.WindowsAzure.Mobile.Service.Security;
 using System.Web.Http.Cors;
+using System.Web.Http.Routing;
 
 namespace MyHomeSecureWeb
 {
@@ -44,8 +45,6 @@ namespace MyHomeSecureWeb
 
     public class MobileServiceInitializer : DropCreateDatabaseIfModelChanges<MobileServiceContext>
     {
-        private IPasswordHash _passwordHash = new PasswordHash();
-
         protected override void Seed(MobileServiceContext context)
         {
             base.Seed(context);

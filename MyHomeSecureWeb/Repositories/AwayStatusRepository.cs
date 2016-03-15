@@ -4,12 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MyHomeSecureWeb.Repositories
 {
     public class AwayStatusRepository : IAwayStatusRepository
     {
         private MobileServiceContext db = new MobileServiceContext();
+
+        private int GoogleTokenExpiryHours = 7 * 24;
 
         public AwayStatus GetStatus(string userName)
         {
@@ -24,10 +27,34 @@ namespace MyHomeSecureWeb.Repositories
 
         public void SetToken(string userName, byte[] tokenHash, byte[] salt)
         {
-            var user = db.AwayStatus.Single(s => s.UserName == userName);
+            var user = GetStatus(userName);
             user.TokenHash = tokenHash;
             user.TokenSalt = salt;
             db.SaveChanges();
+        }
+
+        public async Task SetGoogleTokenAsync(string userName, string googleToken)
+        {
+            var user = GetStatus(userName);
+            user.GoogleToken = googleToken;
+            user.GoogleTokenExpires = DateTime.Now.AddHours(GoogleTokenExpiryHours);
+            await db.SaveChangesAsync();
+        }
+
+        public AwayStatus LookupGoogleToken(string googleToken)
+        {
+            var checkDate = DateTime.Now;
+            return db.AwayStatus.SingleOrDefault(s => s.GoogleToken == googleToken && s.GoogleTokenExpires > checkDate);
+        }
+
+        public async Task SetDriveTokensAsync(string userName, string accessToken, string refreshToken = null)
+        {
+            var user = GetStatus(userName);
+            user.DriveAccessToken = accessToken;
+            if (!string.IsNullOrEmpty(refreshToken)) {
+                user.DriveRefreshToken = refreshToken;
+            }
+            await db.SaveChangesAsync();
         }
 
         public void AddUser(string userName, string homeHubId)

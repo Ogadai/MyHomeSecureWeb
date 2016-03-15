@@ -1,19 +1,15 @@
 ﻿using Microsoft.WindowsAzure.Mobile.Service.Security;
 using MyHomeSecureWeb.Repositories;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Principal;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace MyHomeSecureWeb.Utilities
 {
     public class LookupToken : ILookupToken
     {
-        private const string CacheKeyTemplate = "GoogleTokenUser_{0}";
         private const string GoogleTokenUrl = "https://www.googleapis.com/oauth2/v1/userinfo?access_token={0}";
 
         public async Task<string> GetEmailAddress(IPrincipal user)
@@ -26,7 +22,7 @@ namespace MyHomeSecureWeb.Utilities
                 var google = identities.OfType<GoogleCredentials>().FirstOrDefault();
                 if (google != null)
                 {
-                    var cachedEmail = GetEmailFromCache(google.AccessToken);
+                    var cachedEmail = LookupEmailFromToken(google.AccessToken);
                     if (!string.IsNullOrEmpty(cachedEmail))
                     {
                         return cachedEmail;
@@ -35,7 +31,7 @@ namespace MyHomeSecureWeb.Utilities
                     var googleInfo = await GetProviderInfo(google.AccessToken);
                     var userEmail = googleInfo.Value<string>("email");
 
-                    SetEmailInCache(google.AccessToken, userEmail);
+                    await StoreToken(google.AccessToken, userEmail);
 
                     return userEmail;
                 }
@@ -64,22 +60,20 @@ namespace MyHomeSecureWeb.Utilities
             return null;
         }
 
-        private string GetEmailFromCache(string accessToken)
+        private string LookupEmailFromToken(string accessToken)
         {
-            var cache = HttpContext.Current != null ? HttpContext.Current.Cache : null;
-            return cache != null ? cache[CacheKey(accessToken)] as string : null;
-        }
-        private void SetEmailInCache(string accessToken, string emailAddress)
-        {
-            var cache = HttpContext.Current != null ? HttpContext.Current.Cache : null;
-            if (cache != null)
+            using (IAwayStatusRepository awayStatusRepository = new AwayStatusRepository())
             {
-                cache[CacheKey(accessToken)] = emailAddress;
+                var awayStatus = awayStatusRepository.LookupGoogleToken(accessToken);
+                return awayStatus != null ? awayStatus.UserName : null;
             }
         }
-        private string CacheKey(string accessToken)
+        private async Task StoreToken(string accessToken, string emailAddress)
         {
-            return string.Format(CacheKeyTemplate, accessToken);
+            using (IAwayStatusRepository awayStatusRepository = new AwayStatusRepository())
+            {
+                await awayStatusRepository.SetGoogleTokenAsync(emailAddress, accessToken);
+            }
         }
 
         private async Task<JToken> GetProviderInfo(string accessToken)
