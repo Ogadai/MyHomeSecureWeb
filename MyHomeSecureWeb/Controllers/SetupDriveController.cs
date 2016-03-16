@@ -31,28 +31,28 @@ namespace MyHomeSecureWeb.Controllers
         private const string _tokenExchangeBodyTemplate = "grant_type=authorization_code&code={0}&redirect_uri={1}&client_id={2}&client_secret={3}";
         private const string _scope = "https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email";
 
-        private static string GetClientId()
-        {
-            return WebConfigurationManager.AppSettings["ClientId"];
-        }
-        private static string GetClientSecret()
-        {
-            return WebConfigurationManager.AppSettings["ClientSecret"];
-        }
-
         [HttpGet]
         [Route("api/setupdrive", Name = "SetupDrive")]
         public IHttpActionResult SetupDrive()
         {
-            var redirect = string.Format(_authUrlTemplate, _scope, GetStateString(), GetReturnUrlEnq(), GetClientId(), _randGet.Next(1000));
+            var redirect = string.Format(_authUrlTemplate, _scope, GetStateString(), GetReturnUrlEnq(), AppSettings.GetClientId(), _randGet.Next(1000));
             return Redirect(redirect);
         }
 
         [HttpGet]
         [Route("api/setupdrive/test")]
-        public IHttpActionResult Test()
+        public async Task<IHttpActionResult> Test()
         {
-            return new HtmlActionResult("SetupDriveSuccess", new { UserName = "test@test.com" });
+            var filePath = @"C:\Work\Test\MyHomeSecureNode\devices\test\test.jpg";
+            var byteArray = File.ReadAllBytes(filePath);
+
+            //using (var newUploader = new GoogleDriveUploader())
+            //{
+            //    await newUploader.UploadFile("andy.lee.surfer@gmail.com", "Test", "test-file.jpg", byteArray);
+            //}
+            SnapshotArchiver.Queue("921843cd-1446-49bf-9b4f-119b06fc538e", "garage", byteArray);
+
+            return Ok("Test Worked");
         }
 
         [HttpGet]
@@ -99,7 +99,7 @@ namespace MyHomeSecureWeb.Controllers
         private async Task<GoogleAccessToken> GetAccessToken(string code)
         {
             var returnUrl = Url.Link("SetupDriveCode", new { });
-            var postData = string.Format(_tokenExchangeBodyTemplate, code, GetReturnUrlEnq(), GetClientId(), GetClientSecret());
+            var postData = string.Format(_tokenExchangeBodyTemplate, code, GetReturnUrlEnq(), AppSettings.GetClientId(), AppSettings.GetClientSecret());
             var byteArray = Encoding.UTF8.GetBytes(postData);
 
             // Get the response

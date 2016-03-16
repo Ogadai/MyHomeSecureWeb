@@ -42,6 +42,8 @@ namespace MyHomeSecureWeb.Controllers
             {
                 var bodyBytes = await Request.Content.ReadAsByteArrayAsync();
                 videoHub.ReceivedData(bodyBytes, bodyBytes.Length);
+
+                SnapshotArchiver.Queue(homeHub.Id, node, bodyBytes);
             }
 
             return Ok();

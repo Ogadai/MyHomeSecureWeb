@@ -21,6 +21,11 @@ namespace MyHomeSecureWeb.DataObjects
 
         public string DriveAccessToken { get; set; }
         public string DriveRefreshToken { get; set; }
+
+        public AwayStatus()
+        {
+            GoogleTokenExpires = DateTime.Now;
+        }
     }
 
     public class AwayStatusRequest
