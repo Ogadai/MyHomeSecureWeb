@@ -39,21 +39,21 @@ namespace MyHomeSecureWeb.Controllers
             return Redirect(redirect);
         }
 
-        [HttpGet]
-        [Route("api/setupdrive/test")]
-        public async Task<IHttpActionResult> Test()
-        {
-            var filePath = @"C:\Work\Test\MyHomeSecureNode\devices\test\test.jpg";
-            var byteArray = File.ReadAllBytes(filePath);
+        //[HttpGet]
+        //[Route("api/setupdrive/test")]
+        //public async Task<IHttpActionResult> Test()
+        //{
+        //    var filePath = @"C:\Work\Test\MyHomeSecureNode\devices\test\test.jpg";
+        //    var byteArray = File.ReadAllBytes(filePath);
 
-            //using (var newUploader = new GoogleDriveUploader())
-            //{
-            //    await newUploader.UploadFile("andy.lee.surfer@gmail.com", "Test", "test-file.jpg", byteArray);
-            //}
-            SnapshotArchiver.Queue("921843cd-1446-49bf-9b4f-119b06fc538e", "garage", byteArray);
+        //    //using (var newUploader = new GoogleDriveUploader())
+        //    //{
+        //    //    await newUploader.UploadFile("andy.lee.surfer@gmail.com", "Test", "test-file.jpg", byteArray);
+        //    //}
+        //    SnapshotArchiver.Queue("921843cd-1446-49bf-9b4f-119b06fc538e", "garage", byteArray);
 
-            return Ok("Test Worked");
-        }
+        //    return Ok("Test Worked");
+        //}
 
         [HttpGet]
         [Route("api/setupdrive/code", Name = "SetupDriveCode")]

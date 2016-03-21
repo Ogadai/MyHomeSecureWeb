@@ -15,6 +15,7 @@ namespace MyHomeSecureWeb.Utilities
     {
         private const string _createFolderAddress = "https://www.googleapis.com/drive/v2/files";
         private const string _searchAddressTemplate = "https://www.googleapis.com/drive/v2/files?corpus=DOMAIN&spaces=drive&q={0}";
+        private const string _fileAPIAddressTemplate = _createFolderAddress + "/{0}";
 
         private const string _rootFolderName = "HomeSecureStream";
 
@@ -54,7 +55,7 @@ namespace MyHomeSecureWeb.Utilities
             }
         }
 
-        public async Task<string[]> GetChildrenIDs(string accessToken, string parentId)
+        public async Task<GoogleSearchResult> GetChildrenIDs(string accessToken, string parentId)
         {
             if (string.IsNullOrEmpty(parentId))
             {
@@ -63,9 +64,7 @@ namespace MyHomeSecureWeb.Utilities
 
             var query = string.Format("'{0}' in parents", parentId);
 
-            var searchResult = await Search(accessToken, query);
-
-            return searchResult.Items.Select(item => item.Id).ToArray();
+            return await Search(accessToken, query);
         }
 
         public async Task<GoogleSearchResult> Search(string accessToken, string query)
@@ -87,6 +86,17 @@ namespace MyHomeSecureWeb.Utilities
             }
 
             return JsonConvert.DeserializeObject<GoogleSearchResult>(responseContent);
+        }
+
+        public async Task Delete(string accessToken, string itemId)
+        {
+            var deleteURL = string.Format(_fileAPIAddressTemplate, itemId);
+
+            var request = WebRequest.Create(deleteURL);
+            request.Headers[HttpRequestHeader.Authorization] = string.Format("Bearer {0}", accessToken);
+            request.Method = "DELETE";
+
+            await request.GetResponseAsync();
         }
 
         private async Task<string> CreateFolder(string accessToken, string folderName, string parentId = null)

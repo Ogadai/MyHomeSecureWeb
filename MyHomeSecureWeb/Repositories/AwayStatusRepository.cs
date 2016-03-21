@@ -84,7 +84,12 @@ namespace MyHomeSecureWeb.Repositories
         {
             return db.AwayStatus.Where(s => s.HomeHubId == homeHubId);
         }
-        
+
+        public IQueryable<AwayStatus> GetAll()
+        {
+            return db.AwayStatus;
+        }
+
         public void Dispose()
         {
             db.Dispose();

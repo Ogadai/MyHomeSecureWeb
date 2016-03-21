@@ -50,11 +50,11 @@ Content-Type: image/jpeg
                     var response = ex.Response as HttpWebResponse;
                     if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)
                     {
-//                        services.Log.Info(string.Format("Renewing Drive access token for {0}", emailAddress));
-                        accessToken = await _driveAuth.RefreshAccessToken(emailAddress);
-
                         try
                         {
+                            //                        services.Log.Info(string.Format("Renewing Drive access token for {0}", emailAddress));
+                            accessToken = await _driveAuth.RefreshAccessToken(emailAddress);
+
                             // Try again
                             await UploadWithAccessToken(accessToken, folderPath, fileName, byteArray);
                         }

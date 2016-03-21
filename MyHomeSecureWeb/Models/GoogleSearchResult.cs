@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace MyHomeSecureWeb.Models
 {
@@ -12,5 +13,14 @@ namespace MyHomeSecureWeb.Models
     {
         [JsonProperty("id")]
         public string Id { get; set; }
+
+        [JsonProperty("title")]
+        public string Title { get; set; }
+
+        [JsonProperty("alternateLink")]
+        public string AlternateLink { get; set; }
+
+        [JsonProperty("createdDate")]
+        public DateTime CreatedDate { get; set; }
     }
 }

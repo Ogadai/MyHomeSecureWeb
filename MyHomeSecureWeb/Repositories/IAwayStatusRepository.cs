@@ -13,6 +13,7 @@ namespace MyHomeSecureWeb.Repositories
         void AddUser(string userName, string homeHubId);
         void RemoveUser(string userName);
         IQueryable<AwayStatus> GetAllForHub(string homeHubId);
+        IQueryable<AwayStatus> GetAll();
 
         Task SetGoogleTokenAsync(string userName, string googleToken);
         AwayStatus LookupGoogleToken(string googleToken);
