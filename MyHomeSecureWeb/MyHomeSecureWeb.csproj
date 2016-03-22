@@ -306,6 +306,7 @@
     <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\SetupDriveController.cs" />
     <Compile Include="Controllers\SetupTokenController.cs" />
+    <Compile Include="Controllers\StaticController.cs" />
     <Compile Include="Controllers\TestPushController.cs" />
     <Compile Include="Controllers\TodoItemController.cs" />
     <Compile Include="Controllers\UploadSnapshotController.cs" />
@@ -381,7 +382,12 @@
     <Compile Include="WebSockets\UserAppSocket.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="content\styles.css" />
+    <Content Include="content\styles.css">
+      <BrowseToURL>~/content/styles.css</BrowseToURL>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -403,9 +409,18 @@
   <ItemGroup>
     <None Include="Properties\PublishProfiles\ogadai-secure - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\ogadai-secure - Web Deploy.pubxml" />
-    <Content Include="Views\SetupDriveNotFound.cshtml" />
-    <Content Include="Views\_Layout.cshtml" />
-    <Content Include="Views\SetupDriveSuccess.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\SetupDriveNotFound.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\_Layout.cshtml">
+      <BrowseToURL>~/Views/_Layout.cshtml</BrowseToURL>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\SetupDriveSuccess.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

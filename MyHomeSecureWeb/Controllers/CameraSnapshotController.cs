@@ -4,6 +4,8 @@ using MyHomeSecureWeb.Models;
 using MyHomeSecureWeb.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -26,9 +28,10 @@ namespace MyHomeSecureWeb.Controllers
         private ILookupToken _lookupToken = new LookupToken();
 
         [HttpGet]
-        public async Task<HttpResponseMessage> Get(string node)
+        public async Task<HttpResponseMessage> Get(string node, bool thumbnail = false)
         {
             string hubId = await _lookupToken.GetHomeHubId(User);
+
             if (string.IsNullOrEmpty(hubId))
             {
                 Services.Log.Error("No logged in user", null, "CameraSnapshot");
@@ -41,7 +44,7 @@ namespace MyHomeSecureWeb.Controllers
                 {
                     try
                     {
-                        await PipeSnapshotImage(hubId, node, outputStream);
+                        await PipeSnapshotImage(hubId, node, outputStream, thumbnail);
                     }
                     catch (HttpException ex)
                     {
@@ -70,12 +73,12 @@ namespace MyHomeSecureWeb.Controllers
             await outputStream.WriteAsync(videoData, 0, videoData.Length);
         }
 
-        private async Task PipeSnapshotImage(string hubId, string node, Stream outputStream)
+        private async Task PipeSnapshotImage(string hubId, string node, Stream outputStream, bool thumbnail)
         {
             CameraActivator.Trigger(hubId, node);
             using (var videoHub = VideoHub.Get(hubId, node))
             {
-                using (var videoWaitable = new VideoHubWaitable(videoHub))
+                using (var videoWaitable = new VideoHubWaitable(videoHub, true))
                 {
                     var imageSize = 0;
                     var videoData = await videoWaitable.WaitData();
@@ -83,11 +86,41 @@ namespace MyHomeSecureWeb.Controllers
                     if (videoData.Length != 0 &&
                             !(videoData.Length == 1 && videoData.Bytes[0] == 0))
                     {
-                        await outputStream.WriteAsync(videoData.Bytes, 0, videoData.Length);
+                        var videoBytes = videoData.Bytes;
+                        var videoLength = videoData.Length;
+                        if (thumbnail)
+                        {
+                            videoBytes = CreateThumbnail(videoBytes, videoLength);
+                            videoLength = videoBytes.Length;
+                        }
+
+                        await outputStream.WriteAsync(videoBytes, 0, videoLength);
                         imageSize += videoData.Length;
                     }
                     Services.Log.Info(string.Format("Sent camera snapshot with {0} bytes", imageSize));
                 }
+            }
+        }
+
+        private byte[] CreateThumbnail(byte[] source, int sourceLength)
+        {
+            Image sourceImage = null;
+            using (var ms = new MemoryStream(source, 0, sourceLength))
+            {
+                sourceImage = Image.FromStream(ms);
+            }
+            var sWidth = sourceImage.Width;
+            var sHeight = sourceImage.Height;
+
+            var tWidth = 128;
+            var tHeight = (int)((float)tWidth * ((float)sHeight / (float)sWidth));
+
+            var targetImage = sourceImage.GetThumbnailImage(tWidth, tHeight, () => { return true; }, IntPtr.Zero);
+
+            using (var ms = new MemoryStream())
+            {
+                targetImage.Save(ms, ImageFormat.Jpeg);
+                return ms.ToArray();
             }
         }
 

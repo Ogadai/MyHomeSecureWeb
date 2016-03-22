@@ -13,6 +13,8 @@ namespace MyHomeSecureWeb.Utilities
         public event Action OnClosed;
 
         private static Dictionary<string, VideoHub> _instances = new Dictionary<string, VideoHub>();
+        private static Dictionary<string, VideoHubData> _recentData = new Dictionary<string, VideoHubData>();
+        private const int RecentDataSeconds = 10;
 
         public static VideoHub Get(string homeHubId, string node)
         {
@@ -56,15 +58,34 @@ namespace MyHomeSecureWeb.Utilities
 
         public void ReceivedData(byte[] bytes, int length)
         {
+            var videoData = new VideoHubData
+            {
+                Bytes = bytes,
+                Length = length,
+                Time = DateTime.Now
+            };
+
             if (OnData != null)
             {
-                OnData(new VideoHubData
-                {
-                    Bytes = bytes,
-                    Length = length
-                });
+                OnData(videoData);
             }
+
+            _recentData[_streamId] = videoData;
         }
+
+        public VideoHubData GetRecent()
+        {
+            if (_recentData.ContainsKey(_streamId))
+            {
+                var recent = _recentData[_streamId];
+                if (recent != null && recent.Time > DateTime.Now.AddSeconds(-RecentDataSeconds))
+                {
+                    return recent;
+                }
+            }
+            return null;
+        }
+
         public void Closed()
         {
             if (OnClosed != null)
@@ -94,13 +115,23 @@ namespace MyHomeSecureWeb.Utilities
         private VideoHub _videoHub;
         TaskCompletionSource<VideoHubData> _dataCompletion;
 
-        public VideoHubWaitable(VideoHub videoHub)
+        public VideoHubWaitable(VideoHub videoHub, bool useRecent = false)
         {
             _videoHub = videoHub;
+
             Push();
 
             _videoHub.OnData += _videoHub_OnData;
             _videoHub.OnClosed += _videoHub_OnClosed;
+
+            if (useRecent)
+            {
+                var recentData = _videoHub.GetRecent();
+                if (recentData != null)
+                {
+                    Push(recentData);
+                }
+            }
         }
 
         private void _videoHub_OnData(VideoHubData data)
@@ -158,5 +189,7 @@ namespace MyHomeSecureWeb.Utilities
     {
         public byte[] Bytes { get; set; }
         public int Length { get; set; }
+
+        public DateTime Time { get; set; }
     }
 }
