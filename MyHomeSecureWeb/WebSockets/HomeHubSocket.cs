@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Mobile.Service;
+using MyHomeSecureWeb.Models;
 using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
 using System;
@@ -60,6 +61,8 @@ namespace MyHomeSecureWeb.WebSockets
                     homeHubAwayChange.InitialiseHub();
                     LogConnectionMessage("Hub has connected");
                 }
+
+                _chatHub.MessageToClients(new HubConnectionStatus { Connected = true });
             }
         }
 
@@ -95,6 +98,8 @@ namespace MyHomeSecureWeb.WebSockets
 
             if (_chatHub != null)
             {
+                _chatHub.MessageToClients(new HubConnectionStatus { Connected = false });
+
                 _chatHub.HomeMessage -= _chatHub_HomeMessage;
                 _chatHub.Dispose();
             }

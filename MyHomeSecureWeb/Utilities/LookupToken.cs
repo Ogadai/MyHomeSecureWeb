@@ -46,6 +46,12 @@ namespace MyHomeSecureWeb.Utilities
         public async Task<string> GetHomeHubId(IPrincipal user)
         {
             var emailAddress = await GetEmailAddress(user);
+
+            return GetHomeHubIdFromEmail(emailAddress);
+        }
+
+        public string GetHomeHubIdFromEmail(string emailAddress)
+        {
             if (emailAddress != null)
             {
                 using (var awayStatusRepository = new AwayStatusRepository())

@@ -7,5 +7,6 @@ namespace MyHomeSecureWeb.Utilities
     {
         Task<string> GetEmailAddress(IPrincipal user);
         Task<string> GetHomeHubId(IPrincipal user);
+        string GetHomeHubIdFromEmail(string emailAddress);
     }
 }

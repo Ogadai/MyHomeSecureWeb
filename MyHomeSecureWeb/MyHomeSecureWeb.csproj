@@ -323,6 +323,7 @@
     <Compile Include="Models\GoogleUserInfo.cs" />
     <Compile Include="Models\HubCameraCommand.cs" />
     <Compile Include="Models\HubLocation.cs" />
+    <Compile Include="Models\HubConnectionStatus.cs" />
     <Compile Include="Models\SetupToken.cs" />
     <Compile Include="DataObjects\TodoItem.cs" />
     <Compile Include="Models\HubAwayStatus.cs" />
@@ -332,6 +333,7 @@
     <Compile Include="Models\HubInitialise.cs" />
     <Compile Include="Models\SocketMessageBase.cs" />
     <Compile Include="Models\HubUserTagged.cs" />
+    <Compile Include="Models\UserCheckInOut.cs" />
     <Compile Include="Notifications\IStateNotification.cs" />
     <Compile Include="Notifications\StatusMessage.cs" />
     <Compile Include="Notifications\StateNotification.cs" />

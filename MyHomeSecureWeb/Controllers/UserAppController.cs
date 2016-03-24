@@ -26,7 +26,8 @@ namespace MyHomeSecureWeb.Controllers
         [HttpGet]
         public async Task<HttpResponseMessage> Get()
         {
-            var homeHubId = await _LookupToken.GetHomeHubId(this.User);
+            var userEmail = await _LookupToken.GetEmailAddress(this.User);
+            var homeHubId = _LookupToken.GetHomeHubIdFromEmail(userEmail);
             if (string.IsNullOrEmpty(homeHubId))
             {
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
@@ -36,16 +37,16 @@ namespace MyHomeSecureWeb.Controllers
             if (currentContext.IsWebSocketRequest ||
                 currentContext.IsWebSocketRequestUpgrading)
             {
-                currentContext.AcceptWebSocketRequest((context) => ProcessWSChat(context, homeHubId));
+                currentContext.AcceptWebSocketRequest((context) => ProcessWSChat(context, homeHubId, userEmail));
                 return Request.CreateResponse(HttpStatusCode.SwitchingProtocols);
             }
             return Request.CreateResponse(HttpStatusCode.NotFound);
         }
 
-        private async Task ProcessWSChat(AspNetWebSocketContext context, string homeHubId)
+        private async Task ProcessWSChat(AspNetWebSocketContext context, string homeHubId, string userEmail)
         {
             WebSocket socket = context.WebSocket;
-            using (var userAppSocket = new UserAppSocket(context.WebSocket, Services, homeHubId))
+            using (var userAppSocket = new UserAppSocket(context.WebSocket, Services, homeHubId, userEmail))
             {
                 await userAppSocket.Process();
             }

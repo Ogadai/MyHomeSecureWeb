@@ -47,6 +47,11 @@ namespace MyHomeSecureWeb.Utilities
             }
         }
 
+        public bool HubConnected
+        {
+            get { return HomeMessage != null; }
+        }
+
         private string _homeHubId;
         private int _refCount;
 
