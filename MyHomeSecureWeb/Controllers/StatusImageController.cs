@@ -63,7 +63,6 @@ namespace MyHomeSecureWeb.Controllers
                 Services.Log.Error("No logged in user", null, "SetupToken");
                 return new HttpResponseMessage(HttpStatusCode.Unauthorized);
             }
-            Services.Log.Info(string.Format("Retrieving status image {0}", name));
 
             byte[] imageBytes = null;
             foreach (var email in userEmails)
