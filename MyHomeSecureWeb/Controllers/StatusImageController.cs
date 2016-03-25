@@ -52,7 +52,7 @@ namespace MyHomeSecureWeb.Controllers
 
             return Ok(imageList.ToArray());
         }
-
+        
         [HttpGet]
         [Route("api/statusimage/{name}")]
         public async Task<HttpResponseMessage> GetImage(string name)
@@ -63,11 +63,15 @@ namespace MyHomeSecureWeb.Controllers
                 Services.Log.Error("No logged in user", null, "SetupToken");
                 return new HttpResponseMessage(HttpStatusCode.Unauthorized);
             }
+            Services.Log.Info(string.Format("Retrieving status image {0}", name));
 
             byte[] imageBytes = null;
             foreach (var email in userEmails)
             {
-                imageBytes = await GetStatusImageBytesForUser(email, name);
+                if (imageBytes == null)
+                {
+                    imageBytes = await GetStatusImageBytesForUser(email, name);
+                }
             }
 
             if (imageBytes != null)
@@ -79,6 +83,7 @@ namespace MyHomeSecureWeb.Controllers
             }
             else
             {
+                Services.Log.Error(string.Format("Status image {0} not found", name));
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
         }
