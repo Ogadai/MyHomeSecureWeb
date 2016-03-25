@@ -64,43 +64,7 @@ namespace MyHomeSecureWeb.ScheduledJobs
 
         private async Task RemoveExpiredForUser(string emailAddress)
         {
-            using (IGoogleDriveAuthorization driveAuth = new GoogleDriveAuthorization())
-            {
-                string accessToken = driveAuth.GetAccessToken(emailAddress);
-                if (!string.IsNullOrEmpty(accessToken))
-                {
-                    try
-                    {
-                        await RemoveExpiredWithAccessToken(accessToken);
-                    }
-                    catch (WebException ex)
-                    {
-                        var response = ex.Response as HttpWebResponse;
-                        if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)
-                        {
-                            try
-                            {
-                                accessToken = await driveAuth.RefreshAccessToken(emailAddress);
-
-                                // Try again
-                                await RemoveExpiredWithAccessToken(accessToken);
-                            }
-                            catch (Exception e)
-                            {
-                                Services.Log.Error("Error removing expired snapshots from Drive", e);
-                            }
-                        }
-                        else
-                        {
-                            Services.Log.Error("Error removing expired snapshots from Drive", ex);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Services.Log.Error("Error removing expired snapshots from Drive", e);
-                    }
-                }
-            }
+            await new GoogleDriveAuthHelper(Services).AccessDrive(emailAddress, RemoveExpiredWithAccessToken);
         }
 
         private async Task RemoveExpiredWithAccessToken(string accessToken)

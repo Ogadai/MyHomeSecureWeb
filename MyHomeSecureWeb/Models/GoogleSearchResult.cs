@@ -22,5 +22,8 @@ namespace MyHomeSecureWeb.Models
 
         [JsonProperty("createdDate")]
         public DateTime CreatedDate { get; set; }
+
+        [JsonProperty("modifiedDate")]
+        public DateTime ModifiedDate { get; set; }
     }
 }

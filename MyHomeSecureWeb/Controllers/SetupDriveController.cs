@@ -29,7 +29,7 @@ namespace MyHomeSecureWeb.Controllers
         private const string _lookupEmailAddress = "https://www.googleapis.com/oauth2/v2/userinfo";
 
         private const string _tokenExchangeBodyTemplate = "grant_type=authorization_code&code={0}&redirect_uri={1}&client_id={2}&client_secret={3}";
-        private const string _scope = "https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email";
+        private const string _scope = "https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email";
 
         [HttpGet]
         [Route("api/setupdrive", Name = "SetupDrive")]

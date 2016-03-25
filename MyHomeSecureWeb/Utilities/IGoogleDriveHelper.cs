@@ -9,5 +9,6 @@ namespace MyHomeSecureWeb.Utilities
         Task<GoogleSearchResult> GetChildrenIDs(string accessToken, string parentId = null);
         Task<GoogleSearchResult> Search(string accessToken, string query);
         Task Delete(string accessToken, string itemId);
+        Task<byte[]> GetFileContent(string accessToken, string itemId);
     }
 }

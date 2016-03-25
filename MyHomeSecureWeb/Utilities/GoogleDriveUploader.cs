@@ -1,17 +1,10 @@
-﻿using Microsoft.WindowsAzure.Mobile.Service;
-using MyHomeSecureWeb.DataObjects;
-using MyHomeSecureWeb.Models;
-using MyHomeSecureWeb.Repositories;
+﻿using MyHomeSecureWeb.Models;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http;
 
 namespace MyHomeSecureWeb.Utilities
 {
@@ -38,41 +31,8 @@ Content-Type: image/jpeg
 
         public async Task UploadFile(string emailAddress, string folderPath, string fileName, byte[] byteArray)
         {
-            string accessToken = _driveAuth.GetAccessToken(emailAddress);
-            if (!string.IsNullOrEmpty(accessToken))
-            {
-                try
-                {
-                    await UploadWithAccessToken(accessToken, folderPath, fileName, byteArray);
-                }
-                catch (WebException ex)
-                {
-                    var response = ex.Response as HttpWebResponse;
-                    if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        try
-                        {
-                            //                        services.Log.Info(string.Format("Renewing Drive access token for {0}", emailAddress));
-                            accessToken = await _driveAuth.RefreshAccessToken(emailAddress);
-
-                            // Try again
-                            await UploadWithAccessToken(accessToken, folderPath, fileName, byteArray);
-                        }
-                        catch(Exception e)
-                        {
-//                            services.Log.Error("Error uploading file to Drive", e);
-                        }
-                    }
-                    else
-                    {
-//                        services.Log.Error("Error uploading file to Drive", ex);
-                    }
-                }
-                catch(Exception e)
-                {
-//                    services.Log.Error("Error uploading file to Drive", e);
-                }
-            }
+            await new GoogleDriveAuthHelper().AccessDrive(emailAddress, (string accessToken) =>
+                    UploadWithAccessToken(accessToken, folderPath, fileName, byteArray));
         }
 
         private async Task UploadWithAccessToken(string accessToken, string folderPath, string fileName, byte[] jpegData)

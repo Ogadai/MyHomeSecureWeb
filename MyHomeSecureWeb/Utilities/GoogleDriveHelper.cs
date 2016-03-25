@@ -17,6 +17,8 @@ namespace MyHomeSecureWeb.Utilities
         private const string _searchAddressTemplate = "https://www.googleapis.com/drive/v2/files?corpus=DOMAIN&spaces=drive&q={0}";
         private const string _fileAPIAddressTemplate = _createFolderAddress + "/{0}";
 
+        private const string _fileGetContentAddressTemplate = _createFolderAddress + "/{0}?alt=media";
+
         private const string _rootFolderName = "HomeSecureStream";
 
         public async Task<string> GetFolderId(string accessToken, string folderPath, string parentId)
@@ -97,6 +99,26 @@ namespace MyHomeSecureWeb.Utilities
             request.Method = "DELETE";
 
             await request.GetResponseAsync();
+        }
+
+        public async Task<byte[]> GetFileContent(string accessToken, string itemId)
+        {
+            var fileURL = string.Format(_fileGetContentAddressTemplate, itemId);
+
+            var request = WebRequest.Create(fileURL);
+            request.Headers[HttpRequestHeader.Authorization] = string.Format("Bearer {0}", accessToken);
+
+            var response = await request.GetResponseAsync();
+
+            using (var stream = response.GetResponseStream())
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await stream.CopyToAsync(memoryStream);
+
+                    return memoryStream.GetBuffer();
+                }
+            }
         }
 
         private async Task<string> CreateFolder(string accessToken, string folderName, string parentId = null)

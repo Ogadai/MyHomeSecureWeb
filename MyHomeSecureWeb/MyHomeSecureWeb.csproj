@@ -307,6 +307,7 @@
     <Compile Include="Controllers\SetupDriveController.cs" />
     <Compile Include="Controllers\SetupTokenController.cs" />
     <Compile Include="Controllers\StaticController.cs" />
+    <Compile Include="Controllers\StatusImageController.cs" />
     <Compile Include="Controllers\TestPushController.cs" />
     <Compile Include="Controllers\TodoItemController.cs" />
     <Compile Include="Controllers\UploadSnapshotController.cs" />
@@ -333,6 +334,7 @@
     <Compile Include="Models\HubInitialise.cs" />
     <Compile Include="Models\SocketMessageBase.cs" />
     <Compile Include="Models\HubUserTagged.cs" />
+    <Compile Include="Models\StatusImageInfo.cs" />
     <Compile Include="Models\UserCheckInOut.cs" />
     <Compile Include="Notifications\IStateNotification.cs" />
     <Compile Include="Notifications\StatusMessage.cs" />
@@ -353,6 +355,7 @@
     <Compile Include="Utilities\AppSettings.cs" />
     <Compile Include="Utilities\ChatHub.cs" />
     <Compile Include="Utilities\CheckInOutMonitor.cs" />
+    <Compile Include="Utilities\GoogleDriveAuthHelper.cs" />
     <Compile Include="Utilities\GoogleDriveAuthorization.cs" />
     <Compile Include="Utilities\GoogleDriveHelper.cs" />
     <Compile Include="Utilities\GoogleDriveUploader.cs" />
