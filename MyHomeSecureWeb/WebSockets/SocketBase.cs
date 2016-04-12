@@ -96,8 +96,16 @@ namespace MyHomeSecureWeb.WebSockets
             ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[1024]);
             buffer = new ArraySegment<byte>(
                 Encoding.UTF8.GetBytes(message));
-            _socket.SendAsync(
-                buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+
+            try
+            {
+                _socket.SendAsync(
+                    buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+            catch(Exception ex)
+            {
+                _services.Log.Error("Error sending Websocket message to client", ex);
+            }
         }
 
     }
