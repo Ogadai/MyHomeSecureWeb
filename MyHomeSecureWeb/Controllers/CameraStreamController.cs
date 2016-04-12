@@ -18,28 +18,20 @@ using System.Web.Http.Cors;
 
 namespace MyHomeSecureWeb.Controllers
 {
-    [AuthorizeLevel(AuthorizationLevel.Anonymous)]
+    [AuthorizeLevel(AuthorizationLevel.User)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RequireHttps]
     public class CameraStreamController : ApiController
     {
         public ApiServices Services { get; set; }
 
+        private ILookupToken _lookupToken = new LookupToken();
+
         [HttpGet]
         public async Task<HttpResponseMessage> Get(string hubName, string node)
         {
 
-            string hubId = null;
-            using (var hubRepository = new HomeHubRepository())
-            {
-                var hub = hubRepository.GetHub(hubName);
-                if (hub == null)
-                {
-                    return new HttpResponseMessage(HttpStatusCode.NotFound);
-                }
-
-                hubId = hub.Id;
-            }
+            string hubId = await _lookupToken.GetHomeHubId(User);
 
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
