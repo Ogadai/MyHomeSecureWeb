@@ -97,7 +97,7 @@ namespace MyHomeSecureWeb.Controllers
                         await outputStream.WriteAsync(videoBytes, 0, videoLength);
                         imageSize += videoData.Length;
                     }
-                    Services.Log.Info(string.Format("Sent camera snapshot with {0} bytes", imageSize));
+//                    Services.Log.Info(string.Format("Sent camera snapshot with {0} bytes", imageSize));
                 }
             }
         }
