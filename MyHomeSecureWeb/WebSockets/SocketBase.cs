@@ -88,6 +88,18 @@ namespace MyHomeSecureWeb.WebSockets
 
         public void SendMessage<T>(T message)
         {
+            try
+            {
+                SendMessage(JsonConvert.SerializeObject(message));
+            }
+            catch (Exception ex)
+            {
+                _services.Log.Error("Error sending Websocket message to client", ex);
+            }
+        }
+
+        public void SendMessageRaw<T>(T message)
+        {
             SendMessage(JsonConvert.SerializeObject(message));
         }
 
@@ -97,15 +109,8 @@ namespace MyHomeSecureWeb.WebSockets
             buffer = new ArraySegment<byte>(
                 Encoding.UTF8.GetBytes(message));
 
-            try
-            {
-                _socket.SendAsync(
-                    buffer, WebSocketMessageType.Text, true, CancellationToken.None);
-            }
-            catch(Exception ex)
-            {
-                _services.Log.Error("Error sending Websocket message to client", ex);
-            }
+            _socket.SendAsync(
+                buffer, WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
     }

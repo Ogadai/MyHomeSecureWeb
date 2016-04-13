@@ -5,6 +5,8 @@ using MyHomeSecureWeb.Utilities;
 using System;
 using System.Diagnostics;
 using System.Net.WebSockets;
+using System.Threading;
+using System.Web.Http;
 
 namespace MyHomeSecureWeb.WebSockets
 {
@@ -35,6 +37,8 @@ namespace MyHomeSecureWeb.WebSockets
             }
             set
             {
+                StopMonitoringConnection();
+
                 if (_checkInOutMonitor != null)
                 {
                     _checkInOutMonitor.CheckInOut -= _checkInOutMonitor_CheckInOut;
@@ -63,10 +67,11 @@ namespace MyHomeSecureWeb.WebSockets
                 }
 
                 _chatHub.MessageToClients(new HubConnectionStatus { Connected = true });
+                StartMonitoringConnection();
             }
         }
 
-        private void _chatHub_HomeMessage(Models.SocketMessageBase message)
+        private void _chatHub_HomeMessage(SocketMessageBase message)
         {
             SendMessage(message);
         }
@@ -90,6 +95,8 @@ namespace MyHomeSecureWeb.WebSockets
         public virtual void Dispose()
         {
             Debug.WriteLine("HomeHub Conection closed");
+            StopMonitoringConnection();
+
             if (_checkInOutMonitor != null)
             {
                 _checkInOutMonitor.CheckInOut -= _checkInOutMonitor_CheckInOut;
@@ -115,6 +122,35 @@ namespace MyHomeSecureWeb.WebSockets
                 {
                     logRepository.Priority(HomeHubId, message);
                 }
+            }
+        }
+
+        private Timer _monitorTimer = null;
+        private const int MonitorIntervalMS = 60 * 1000;
+
+        private void StartMonitoringConnection()
+        {
+            _monitorTimer = new Timer(new TimerCallback(CheckConnectionStatus), null, MonitorIntervalMS, MonitorIntervalMS);
+        }
+        private void StopMonitoringConnection()
+        {
+            if (_monitorTimer != null)
+            {
+                _monitorTimer.Dispose();
+                _monitorTimer = null;
+            }
+        }
+
+        private void CheckConnectionStatus(object stateObj)
+        {
+            try
+            {
+                SendMessageRaw(new HubChangeStates { States = new HubChangeState[] { } });
+            }
+            catch(Exception ex)
+            {
+                Services.Log.Error("Error checking hub connection status", ex);
+                Dispose();
             }
         }
     }
