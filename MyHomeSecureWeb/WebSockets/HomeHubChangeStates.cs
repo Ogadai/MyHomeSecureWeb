@@ -3,6 +3,8 @@ using System.Linq;
 using MyHomeSecureWeb.Models;
 using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Notifications;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace MyHomeSecureWeb.WebSockets
 {
@@ -14,7 +16,10 @@ namespace MyHomeSecureWeb.WebSockets
         private IStateNotification _statusNotification;
 
         private string[] _priorityStates = new[] { "Away", "Alert", "Alarm" };
-        private string[] _notificationStates = new[] { "Alert", "Alarm" };
+        private Dictionary<string, string> _alertStates = new Dictionary<string, string> { { "Alert", "Alarm" } };
+        private string[] _notificationStates = new[] { "Alarm" };
+
+        private const int AlertToAlarmMS = 45000;
 
         public HomeHubChangeStates(IHomeHubSocket homeHubSocket)
         {
@@ -36,7 +41,20 @@ namespace MyHomeSecureWeb.WebSockets
                         _logRepository.LogEntry(_homeHubSocket.HomeHubId, severity,
                             string.Format("{0} changed to {1}", state.Name, state.Active ? "Active" : "Inactive"));
 
-                        if (_notificationStates.Contains(state.Name))
+                        if (_alertStates.Keys.Contains(state.Name))
+                        {
+                            ClearTimerUpdates();
+                            if (state.Active)
+                            {
+                                var timerStates = new HubChangeStates {
+                                    States = new HubChangeState[] { new HubChangeState { Name = _alertStates[state.Name], Active = true } }
+                                };
+
+                                AddTimerUpdate(timerStates, AlertToAlarmMS);
+                            }
+                        }
+
+                        if (_notificationStates.Contains(state.Name) && state.Active)
                         {
                             // Send a notification to devices
                             _statusNotification.Send(_homeHubSocket.HomeHubId, state.Name, state.Active);
@@ -48,10 +66,59 @@ namespace MyHomeSecureWeb.WebSockets
             }
         }
 
+        private static Dictionary<string, ChangeStatesTimerUpdate> _timerUpdates = new Dictionary<string, ChangeStatesTimerUpdate>();
+        private void ClearTimerUpdates()
+        {
+            lock(_timerUpdates)
+            {
+                if (_timerUpdates.ContainsKey(_homeHubSocket.HomeHubId))
+                {
+                    _timerUpdates[_homeHubSocket.HomeHubId].Cancel();
+                    _timerUpdates.Remove(_homeHubSocket.HomeHubId);
+                }
+            }
+        }
+
+        private void AddTimerUpdate(HubChangeStates states, int milliseconds)
+        {
+            lock(_timerUpdates)
+            {
+                _timerUpdates[_homeHubSocket.HomeHubId] =
+                        new ChangeStatesTimerUpdate(_homeHubSocket, states, milliseconds);
+            }
+        }
+
         public void Dispose()
         {
             _hubStateRepository.Dispose();
             _logRepository.Dispose();
+        }
+
+        private class ChangeStatesTimerUpdate
+        {
+            private IHomeHubSocket _homeHubSocket;
+            private HubChangeStates _states;
+
+            private Timer _timer;
+
+            public ChangeStatesTimerUpdate(IHomeHubSocket homeHubSocket, HubChangeStates states, int milliseconds)
+            {
+                _homeHubSocket = homeHubSocket;
+                _states = states;
+
+                _timer = new Timer(new TimerCallback(Execute), null, milliseconds, Timeout.Infinite);
+            }
+
+            private void Execute(object arg)
+            {
+                var changeState = new HomeHubChangeStates(_homeHubSocket);
+                changeState.ChangeStates(_states);
+            }
+
+            public void Cancel()
+            {
+                _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
         }
     }
 }
