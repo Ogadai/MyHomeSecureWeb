@@ -121,19 +121,21 @@ namespace MyHomeSecureWeb.WebSockets
         private void InitialiseCameras(string homeHubId, HubInitialiseCamera[] cameras)
         {
             var hubCameras = _cameraRepository.GetAllForHub(homeHubId).ToList();
-
-            foreach (var camera in cameras)
+            if (cameras != null)
             {
-                if (!string.IsNullOrEmpty(camera.Name) && !string.IsNullOrEmpty(camera.Node))
+                foreach (var camera in cameras)
                 {
-                    var existingCamera = hubCameras.SingleOrDefault(c => c.Name == camera.Name);
-                    if (existingCamera != null)
+                    if (!string.IsNullOrEmpty(camera.Name) && !string.IsNullOrEmpty(camera.Node))
                     {
-                        hubCameras.Remove(existingCamera);
-                    }
-                    else
-                    {
-                        _cameraRepository.AddCamera(camera.Name, camera.Node, homeHubId);
+                        var existingCamera = hubCameras.SingleOrDefault(c => c.Name == camera.Name);
+                        if (existingCamera != null)
+                        {
+                            hubCameras.Remove(existingCamera);
+                        }
+                        else
+                        {
+                            _cameraRepository.AddCamera(camera.Name, camera.Node, homeHubId);
+                        }
                     }
                 }
             }
