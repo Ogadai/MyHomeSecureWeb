@@ -17,5 +17,6 @@ namespace MyHomeSecureWeb.DataObjects
         public virtual ICollection<AwayStatus> AwayStatus { get; set; }
         public virtual ICollection<LogEntry> LogEntries { get; set; }
         public virtual ICollection<HubState> States { get; set; }
+        public virtual ICollection<HubCamera> Cameras { get; set; }
     }
 }

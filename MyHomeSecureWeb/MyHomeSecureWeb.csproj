@@ -299,6 +299,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AwayStatusController.cs" />
     <Compile Include="Controllers\CameraController.cs" />
+    <Compile Include="Controllers\CameraListController.cs" />
     <Compile Include="Controllers\CameraSnapshotController.cs" />
     <Compile Include="Controllers\CameraStreamController.cs" />
     <Compile Include="Controllers\HomeHubController.cs" />
@@ -315,6 +316,7 @@
     <Compile Include="Controllers\UserAppController.cs" />
     <Compile Include="DataObjects\AwayStatus.cs" />
     <Compile Include="DataObjects\HomeHub.cs" />
+    <Compile Include="DataObjects\HubCamera.cs" />
     <Compile Include="DataObjects\HubState.cs" />
     <Compile Include="DataObjects\LogEntry.cs" />
     <Compile Include="Models\CameraInitialiseRequest.cs" />
@@ -340,9 +342,11 @@
     <Compile Include="Notifications\StatusMessage.cs" />
     <Compile Include="Notifications\StateNotification.cs" />
     <Compile Include="Repositories\AwayStatusRepository.cs" />
+    <Compile Include="Repositories\CameraRepository.cs" />
     <Compile Include="Repositories\HomeHubRepository.cs" />
     <Compile Include="Repositories\HubStateRepository.cs" />
     <Compile Include="Repositories\IAwayStatusRepository.cs" />
+    <Compile Include="Repositories\ICameraRepository.cs" />
     <Compile Include="Repositories\IHomeHubRepository.cs" />
     <Compile Include="Repositories\IHubStateRepository.cs" />
     <Compile Include="Repositories\ILogRepository.cs" />

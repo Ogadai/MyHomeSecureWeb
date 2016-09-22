@@ -11,11 +11,18 @@
 
         public HubInitialiseUser[] Users { get; set; }
         public string[] States { get; set; }
+        public HubInitialiseCamera[] Cameras { get; set; }
     }
 
     public class HubInitialiseUser : SocketMessageBase
     {
         public string Name { get; set; }
         public string Token { get; set; }
+    }
+
+    public class HubInitialiseCamera
+    {
+        public string Name { get; set; }
+        public string Node { get; set; }
     }
 }

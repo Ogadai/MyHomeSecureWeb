@@ -32,6 +32,7 @@ namespace MyHomeSecureWeb.Models
         public DbSet<HomeHub> HomeHubs { get; set; }
         public DbSet<LogEntry> LogEntries { get; set; }
         public DbSet<HubState> HubStates { get; set; }
+        public DbSet<HubCamera> HubCameras { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

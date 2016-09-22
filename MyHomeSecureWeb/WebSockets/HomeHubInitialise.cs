@@ -14,6 +14,7 @@ namespace MyHomeSecureWeb.WebSockets
         private IHomeHubRepository _homeHubRepository = new HomeHubRepository();
         private IAwayStatusRepository _awayStatusRepository = new AwayStatusRepository();
         private IHubStateRepository _hubStateRepository = new HubStateRepository();
+        private ICameraRepository _cameraRepository = new CameraRepository();
         private IPasswordHash _passwordHash = new PasswordHash();
 
         public HomeHubInitialise(IHomeHubSocket homeHubSocket)
@@ -53,6 +54,7 @@ namespace MyHomeSecureWeb.WebSockets
 
             InitialiseUsers(hub.Id, request.Users);
             InitialiseStates(hub.Id, request.States);
+            InitialiseCameras(hub.Id, request.Cameras);
 
             // Set the initialised home hub id
             _homeHubSocket.HomeHubId = hub.Id;
@@ -116,12 +118,40 @@ namespace MyHomeSecureWeb.WebSockets
             }
         }
 
+        private void InitialiseCameras(string homeHubId, HubInitialiseCamera[] cameras)
+        {
+            var hubCameras = _cameraRepository.GetAllForHub(homeHubId).ToList();
+
+            foreach (var camera in cameras)
+            {
+                if (!string.IsNullOrEmpty(camera.Name) && !string.IsNullOrEmpty(camera.Node))
+                {
+                    var existingCamera = hubCameras.SingleOrDefault(c => c.Name == camera.Name);
+                    if (existingCamera != null)
+                    {
+                        hubCameras.Remove(existingCamera);
+                    }
+                    else
+                    {
+                        _cameraRepository.AddCamera(camera.Name, camera.Node, homeHubId);
+                    }
+                }
+            }
+
+            // Remove unused cameras
+            foreach (var camera in hubCameras)
+            {
+                _cameraRepository.RemoveCamera(camera.Name, homeHubId);
+            }
+        }
+
         public void Dispose()
         {
             _logRepository.Dispose();
             _homeHubRepository.Dispose();
             _awayStatusRepository.Dispose();
             _hubStateRepository.Dispose();
+            _cameraRepository.Dispose();
         }
     }
 }

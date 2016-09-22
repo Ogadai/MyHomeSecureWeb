@@ -9,5 +9,7 @@
     {
         public string Name { get; set; }
         public bool Active { get; set; }
+        public string Node { get; set; }
+        public string Rule { get; set; }
     }
 }

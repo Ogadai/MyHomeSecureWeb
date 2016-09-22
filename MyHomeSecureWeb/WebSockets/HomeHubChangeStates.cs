@@ -38,8 +38,19 @@ namespace MyHomeSecureWeb.WebSockets
                     if (changed)
                     {
                         string severity = _priorityStates.Contains(state.Name) ? "Priority" : "Info";
-                        _logRepository.LogEntry(_homeHubSocket.HomeHubId, severity,
-                            string.Format("{0} changed to {1}", state.Name, state.Active ? "Active" : "Inactive"));
+
+                        string logMessage = string.Format("{0} changed to {1}", state.Name, state.Active ? "Active" : "Inactive");
+                        if (!string.IsNullOrEmpty(state.Node))
+                        {
+                            logMessage = string.Format("{0} > {1}", logMessage, state.Node);
+                        }
+                        if (!string.IsNullOrEmpty(state.Rule))
+                        {
+                            logMessage = string.Format("{0} | {1}", logMessage, state.Rule);
+                        }
+
+                        _logRepository.LogEntry(_homeHubSocket.HomeHubId, severity, logMessage);
+
 
                         if (_alertStates.Keys.Contains(state.Name))
                         {
