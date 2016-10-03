@@ -15,7 +15,7 @@ namespace MyHomeSecureWeb.Notifications
             _services = services;
         }
 
-        public async Task Send(string homeHubId, string state, bool active)
+        public async Task Send(string homeHubId, string state, bool active, string node, string rule)
         {
             // Don't send if not activating state
             if (!active) return;
@@ -24,7 +24,9 @@ namespace MyHomeSecureWeb.Notifications
                 Message = "StateNotification",
                 HomeHubId = homeHubId,
                 State = state,
-                Active = active
+                Active = active,
+                Node = node,
+                Rule = rule
             };
             Dictionary<string, string> data = new Dictionary<string, string>()
             {
