@@ -17,7 +17,7 @@ namespace MyHomeSecureWeb.WebSockets
 
         private string[] _priorityStates = new[] { "Away", "Alert", "Alarm" };
         private Dictionary<string, string> _alertStates = new Dictionary<string, string> { { "Alert", "Alarm" } };
-        private string[] _notificationStates = new[] { "Alarm" };
+        private string[] _notificationStates = new[] { "Alert", "Alarm" };
 
         private const int AlertToAlarmMS = 45000;
 
