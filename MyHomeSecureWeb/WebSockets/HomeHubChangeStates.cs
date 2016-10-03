@@ -65,7 +65,7 @@ namespace MyHomeSecureWeb.WebSockets
                             }
                         }
 
-                        if (_notificationStates.Contains(state.Name) && state.Active)
+                        if (_notificationStates.Contains(state.Name))
                         {
                             // Send a notification to devices
                             _statusNotification.Send(_homeHubSocket.HomeHubId, state.Name, state.Active, state.Node, state.Rule);
