@@ -28,7 +28,7 @@ namespace MyHomeSecureWeb.Controllers
         private ILookupToken _lookupToken = new LookupToken();
 
         private const int LongTimelapse = 10000;
-        private const int ShortTimelapse = 1000;
+        private const int ShortTimelapse = 100;
 
         [HttpGet]
         public async Task<HttpResponseMessage> Get(string node, bool thumbnail = false, bool singleImage = false)
