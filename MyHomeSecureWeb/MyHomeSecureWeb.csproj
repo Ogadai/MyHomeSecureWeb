@@ -309,7 +309,6 @@
     <Compile Include="Controllers\SetupTokenController.cs" />
     <Compile Include="Controllers\StaticController.cs" />
     <Compile Include="Controllers\StatusImageController.cs" />
-    <Compile Include="Controllers\TestPushController.cs" />
     <Compile Include="Controllers\TodoItemController.cs" />
     <Compile Include="Controllers\UploadSnapshotController.cs" />
     <Compile Include="Controllers\UploadStreamController.cs" />

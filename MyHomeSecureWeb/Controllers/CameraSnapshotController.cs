@@ -27,8 +27,11 @@ namespace MyHomeSecureWeb.Controllers
 
         private ILookupToken _lookupToken = new LookupToken();
 
+        private const int LongTimelapse = 10000;
+        private const int ShortTimelapse = 1000;
+
         [HttpGet]
-        public async Task<HttpResponseMessage> Get(string node, bool thumbnail = false)
+        public async Task<HttpResponseMessage> Get(string node, bool thumbnail = false, bool singleImage = false)
         {
             string hubId = await _lookupToken.GetHomeHubId(User);
 
@@ -44,7 +47,7 @@ namespace MyHomeSecureWeb.Controllers
                 {
                     try
                     {
-                        await PipeSnapshotImage(hubId, node, outputStream, thumbnail);
+                        await PipeSnapshotImage(hubId, node, outputStream, thumbnail, singleImage);
                     }
                     catch (HttpException ex)
                     {
@@ -73,9 +76,11 @@ namespace MyHomeSecureWeb.Controllers
             await outputStream.WriteAsync(videoData, 0, videoData.Length);
         }
 
-        private async Task PipeSnapshotImage(string hubId, string node, Stream outputStream, bool thumbnail)
+        private async Task PipeSnapshotImage(string hubId, string node, Stream outputStream, bool thumbnail, bool singleImage)
         {
-            CameraActivator.Trigger(hubId, node);
+            int duration = thumbnail || singleImage ? LongTimelapse : ShortTimelapse;
+            CameraActivator.Trigger(hubId, node, duration);
+
             using (var videoHub = VideoHub.Get(hubId, node))
             {
                 using (var videoWaitable = new VideoHubWaitable(videoHub, true))
@@ -127,14 +132,14 @@ namespace MyHomeSecureWeb.Controllers
         private class CameraActivator
         {
             private static Dictionary<string, CameraActivator> _activators = new Dictionary<string, CameraActivator>();
-            public static void Trigger(string hub, string node)
+            public static void Trigger(string hub, string node, int duration = 10000)
             {
                 var id = Id(hub, node);
                 if (!_activators.ContainsKey(id))
                 {
                     _activators[id] = new CameraActivator(hub, node);
                 }
-                _activators[id].Trigger();
+                _activators[id].Trigger(duration);
             }
             private static string Id(string hub, string node)
             {
@@ -159,13 +164,13 @@ namespace MyHomeSecureWeb.Controllers
                 });
             }
 
-            public void Trigger()
+            public void Trigger(int duration)
             {
                 if (_deactivator != null)
                 {
                     _deactivator.Cancelled = true;
                 }
-                _deactivator = new Deactivator(() =>
+                _deactivator = new Deactivator(duration, () =>
                 {
                     _activators.Remove(Id(_hub, _node));
                     _chatHub.MessageToHome(new HubCameraCommand
@@ -180,11 +185,11 @@ namespace MyHomeSecureWeb.Controllers
             private class Deactivator
             {
                 public bool Cancelled { get; set; }
-                public Deactivator(Action callback)
+                public Deactivator(int duration, Action callback)
                 {
                     new Thread(new ThreadStart(() =>
                     {
-                        Thread.Sleep(10000);
+                        Thread.Sleep(duration);
                         if (!Cancelled)
                         {
                             callback();
