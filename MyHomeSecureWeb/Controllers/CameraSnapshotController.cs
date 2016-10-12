@@ -28,7 +28,8 @@ namespace MyHomeSecureWeb.Controllers
         private ILookupToken _lookupToken = new LookupToken();
 
         private const int LongTimelapse = 10000;
-        private const int ShortTimelapse = 100;
+        private const int ShortTimelapse = 2000;
+        private const int ThumbnailWidth = 512;
 
         [HttpGet]
         public async Task<HttpResponseMessage> Get(string node, bool thumbnail = false, bool singleImage = false)
@@ -78,7 +79,7 @@ namespace MyHomeSecureWeb.Controllers
 
         private async Task PipeSnapshotImage(string hubId, string node, Stream outputStream, bool thumbnail, bool singleImage)
         {
-            int duration = thumbnail || singleImage ? LongTimelapse : ShortTimelapse;
+            int duration = thumbnail || singleImage ? ShortTimelapse : LongTimelapse;
             CameraActivator.Trigger(hubId, node, duration);
 
             using (var videoHub = VideoHub.Get(hubId, node))
@@ -117,7 +118,7 @@ namespace MyHomeSecureWeb.Controllers
             var sWidth = sourceImage.Width;
             var sHeight = sourceImage.Height;
 
-            var tWidth = 128;
+            var tWidth = ThumbnailWidth;
             var tHeight = (int)((float)tWidth * ((float)sHeight / (float)sWidth));
 
             var targetImage = sourceImage.GetThumbnailImage(tWidth, tHeight, () => { return true; }, IntPtr.Zero);
