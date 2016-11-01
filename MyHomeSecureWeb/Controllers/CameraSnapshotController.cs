@@ -28,7 +28,7 @@ namespace MyHomeSecureWeb.Controllers
         private ILookupToken _lookupToken = new LookupToken();
 
         private const int LongTimelapse = 10000;
-        private const int ShortTimelapse = 2000;
+        private const int ShortTimelapse = 1000;
         private const int ThumbnailWidth = 512;
 
         [HttpGet]
@@ -102,6 +102,8 @@ namespace MyHomeSecureWeb.Controllers
 
                         await outputStream.WriteAsync(videoBytes, 0, videoLength);
                         imageSize += videoData.Length;
+
+                        CameraActivator.Received(hubId, node);
                     }
 //                    Services.Log.Info(string.Format("Sent camera snapshot with {0} bytes", imageSize));
                 }
@@ -142,6 +144,14 @@ namespace MyHomeSecureWeb.Controllers
                 }
                 _activators[id].Trigger(duration);
             }
+            public static void Received(string hub, string node)
+            {
+                var id = Id(hub, node);
+                if (_activators.ContainsKey(id))
+                {
+                    _activators[id].Received();
+                }
+            }
             private static string Id(string hub, string node)
             {
                 return string.Format("{0}|{1}", hub, node);
@@ -151,6 +161,11 @@ namespace MyHomeSecureWeb.Controllers
             private string _hub;
             private string _node;
             private Deactivator _deactivator;
+
+            private bool _received;
+            private bool _timedOut;
+            private DateTime _timeoutTime;
+
             protected CameraActivator(string hub, string node)
             {
                 _chatHub = ChatHub.Get(hub);
@@ -167,19 +182,64 @@ namespace MyHomeSecureWeb.Controllers
 
             public void Trigger(int duration)
             {
+                _received = false;
+                _timedOut = false;
                 if (_deactivator != null)
                 {
                     _deactivator.Cancelled = true;
                 }
-                _deactivator = new Deactivator(duration, () =>
+                _deactivator = new Deactivator(duration, TimedOut);
+            }
+
+            public void Received()
+            {
+                if (_timedOut)
                 {
-                    _activators.Remove(Id(_hub, _node));
-                    _chatHub.MessageToHome(new HubCameraCommand
+                    if (_deactivator != null)
                     {
-                        Node = _node,
-                        Active = false,
-                        Type = "timelapse"
-                    });
+                        _deactivator.Cancelled = true;
+                    }
+                    Deactivate();
+                }
+                else
+                {
+                    _received = true;
+                }
+            }
+
+            private void TimedOut()
+            {
+                if (_received)
+                {
+                    Deactivate();
+                }
+                else
+                {
+                    if (!_timedOut)
+                    {
+                        _timedOut = true;
+                        _timeoutTime = DateTime.Now;
+                    }
+
+                    if (DateTime.Now.Subtract(_timeoutTime) > TimeSpan.FromSeconds(10))
+                    {
+                        Deactivate();
+                    }
+                    else
+                    {
+                        _deactivator = new Deactivator(ShortTimelapse, TimedOut);
+                    }
+                }
+            }
+
+            private void Deactivate()
+            {
+                _activators.Remove(Id(_hub, _node));
+                _chatHub.MessageToHome(new HubCameraCommand
+                {
+                    Node = _node,
+                    Active = false,
+                    Type = "timelapse"
                 });
             }
 

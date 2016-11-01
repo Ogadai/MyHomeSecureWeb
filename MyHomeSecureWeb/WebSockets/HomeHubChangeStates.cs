@@ -17,7 +17,7 @@ namespace MyHomeSecureWeb.WebSockets
 
         private string[] _priorityStates = new[] { "Away", "Alert", "Alarm" };
         private Dictionary<string, string> _alertStates = new Dictionary<string, string> { { "Alert", "Alarm" } };
-        private string[] _notificationStates = new[] { "Alert", "Alarm" };
+        private string[] _notificationStates = new[] { "Away", "Alert", "Alarm" };
 
         private const int AlertToAlarmMS = 45000;
 
@@ -51,14 +51,16 @@ namespace MyHomeSecureWeb.WebSockets
 
                         _logRepository.LogEntry(_homeHubSocket.HomeHubId, severity, logMessage);
 
-
                         if (_alertStates.Keys.Contains(state.Name))
                         {
                             ClearTimerUpdates();
                             if (state.Active)
                             {
                                 var timerStates = new HubChangeStates {
-                                    States = new HubChangeState[] { new HubChangeState { Name = _alertStates[state.Name], Active = true } }
+                                    States = new HubChangeState[] {
+                                        new HubChangeState { Name = state.Name, Active = false },
+                                        new HubChangeState { Name = _alertStates[state.Name], Active = true }
+                                    }
                                 };
 
                                 AddTimerUpdate(timerStates, AlertToAlarmMS);
