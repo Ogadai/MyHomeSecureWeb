@@ -17,9 +17,6 @@ namespace MyHomeSecureWeb.Notifications
 
         public async Task Send(string homeHubId, string state, bool active, string node, string rule)
         {
-            // Don't send if not activating state
-            if (!active) return;
-
             var statusMessage = new StatusMessage {
                 Message = "StateNotification",
                 HomeHubId = homeHubId,
