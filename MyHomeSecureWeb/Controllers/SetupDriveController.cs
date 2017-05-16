@@ -15,6 +15,7 @@ using MyHomeSecureWeb.Repositories;
 
 namespace MyHomeSecureWeb.Controllers
 {
+    [AuthorizeLevel(AuthorizationLevel.Anonymous)]
     [GoogleAuthorisation(AuthorizationLevel.Anonymous)]
     [RequireHttps]
     public class SetupDriveController : ApiController

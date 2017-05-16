@@ -11,6 +11,7 @@ using System.Web.Http.Description;
 
 namespace MyHomeSecureWeb.Controllers
 {
+    [AuthorizeLevel(AuthorizationLevel.Anonymous)]
     [GoogleAuthorisation(AuthorizationLevel.User)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RequireHttps]

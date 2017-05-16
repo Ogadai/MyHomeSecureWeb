@@ -5,6 +5,7 @@ using System.Web.Http;
 
 namespace MyHomeSecureWeb.Controllers
 {
+    [AuthorizeLevel(AuthorizationLevel.Anonymous)]
     [GoogleAuthorisation(AuthorizationLevel.Anonymous)]
     public class StaticController : ApiController
     {

@@ -2,6 +2,7 @@
 using MyHomeSecureWeb.DataObjects;
 using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
+using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using System.Web.Http.Cors;
 
 namespace MyHomeSecureWeb.Controllers
 {
+    [AuthorizeLevel(AuthorizationLevel.Anonymous)]
     [GoogleAuthorisation(AuthorizationLevel.User)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RequireHttps]

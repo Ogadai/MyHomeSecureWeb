@@ -9,6 +9,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Net.Http;
 using System.Net;
+using System.Diagnostics;
 
 namespace MyHomeSecureWeb.Utilities
 {
@@ -31,18 +32,20 @@ namespace MyHomeSecureWeb.Utilities
         public override void OnAuthorization(HttpActionContext actionContext)
         {
             var headers = actionContext.Request.Headers;
-            
-            var appKey = headers.Contains("X-ZUMO-APPLICATION") ? headers.GetValues("X-ZUMO-APPLICATION").First() : "";
-            var authToken = headers.Contains("X-ZUMO-AUTH") ? headers.GetValues("X-ZUMO-AUTH").FirstOrDefault() : "";
+
+            var appKey = headers.Contains("APPKEY") ? headers.GetValues("APPKEY").First() : "";
+            var authToken = headers.Contains("AUTHTOKEN") ? headers.GetValues("AUTHTOKEN").FirstOrDefault() : "";
 
             if (_level != AuthorizationLevel.Anonymous &&
                 (string.IsNullOrEmpty(appKey)
               || (!string.IsNullOrEmpty(_applicationKey) && string.Compare(appKey, _applicationKey) != 0)
               || string.IsNullOrEmpty(authToken)))
             {
+                Trace.TraceError(string.Format("Failed Auth: AppKey: {0}, Token: {1}", appKey, authToken));
                 actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized);
                 return;
             }
+            Trace.TraceInformation(string.Format("Successful Auth: AppKey: {0}, Token: {1}", appKey, authToken));
 
             if (!string.IsNullOrEmpty(authToken))
             {
