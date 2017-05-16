@@ -4,6 +4,10 @@ namespace MyHomeSecureWeb.Utilities
 {
     public class AppSettings
     {
+        public static string GetApplicationKey()
+        {
+            return WebConfigurationManager.AppSettings["ApplicationKey"];
+        }
         public static string GetClientId()
         {
             return WebConfigurationManager.AppSettings["ClientId"];

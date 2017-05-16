@@ -7,7 +7,7 @@ using System.Web.Http;
 
 namespace MyHomeSecureWeb.Controllers
 {
-    //[AuthorizeLevel(AuthorizationLevel.Anonymous)]
+    //[GoogleAuthorisation(AuthorizationLevel.Anonymous)]
     //public class TestController : ApiController
     //{
     //    public ApiServices Services { get; set; }

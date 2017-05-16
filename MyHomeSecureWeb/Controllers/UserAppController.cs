@@ -14,7 +14,7 @@ using System.Web.WebSockets;
 
 namespace MyHomeSecureWeb.Controllers
 {
-    [AuthorizeLevel(AuthorizationLevel.User)]
+    [GoogleAuthorisation(AuthorizationLevel.User)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RequireHttps]
     public class UserAppController : ApiController

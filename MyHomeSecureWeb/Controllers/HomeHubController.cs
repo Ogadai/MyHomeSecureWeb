@@ -13,7 +13,7 @@ using Microsoft.WindowsAzure.Mobile.Service;
 
 namespace MyHomeSecureWeb.Controllers
 {
-    [AuthorizeLevel(AuthorizationLevel.Anonymous)]
+    [GoogleAuthorisation(AuthorizationLevel.Anonymous)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RequireHttps]
     public class HomeHubController : ApiController

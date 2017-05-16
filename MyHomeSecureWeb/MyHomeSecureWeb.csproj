@@ -358,6 +358,7 @@
     <Compile Include="Utilities\AppSettings.cs" />
     <Compile Include="Utilities\ChatHub.cs" />
     <Compile Include="Utilities\CheckInOutMonitor.cs" />
+    <Compile Include="Utilities\GoogleAuthorisationAttribute.cs" />
     <Compile Include="Utilities\GoogleDriveAuthHelper.cs" />
     <Compile Include="Utilities\GoogleDriveAuthorization.cs" />
     <Compile Include="Utilities\GoogleDriveHelper.cs" />
@@ -448,7 +449,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>56954</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44300/</IISUrl>
+          <IISUrl>http://localhost:8080/</IISUrl>
+          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
+          <IISAppRootUrl>http://127.0.0.1:8080/</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

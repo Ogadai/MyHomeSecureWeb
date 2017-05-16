@@ -9,7 +9,7 @@ using System.Web.Http.Cors;
 
 namespace MyHomeSecureWeb.Controllers
 {
-    [AuthorizeLevel(AuthorizationLevel.Anonymous)]
+    [GoogleAuthorisation(AuthorizationLevel.Anonymous)]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RequireHttps]
     public class UploadSnapshotController : ApiController

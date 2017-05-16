@@ -1,37 +1,48 @@
 ﻿using Microsoft.WindowsAzure.Mobile.Service.Security;
 using MyHomeSecureWeb.Repositories;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MyHomeSecureWeb.Utilities
 {
     public class LookupToken : ILookupToken
     {
-        private const string GoogleTokenUrl = "https://www.googleapis.com/oauth2/v1/userinfo?access_token={0}";
+        private const string GoogleTokenUrl = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token={0}";
+
+        private static String _clientId = AppSettings.GetClientId();
 
         public async Task<string> GetEmailAddress(IPrincipal user)
         {
             try
             {
-                var identities = await (user as ServiceUser).GetIdentitiesAsync();
-
-                //Check if the user has logged in using Google as Identity provider
-                var google = identities.OfType<GoogleCredentials>().FirstOrDefault();
+                var google = Thread.CurrentPrincipal.Identity as GoogleAuthorisationIdentity;
                 if (google != null)
                 {
-                    var cachedEmail = LookupEmailFromToken(google.AccessToken);
+                    var cachedEmail = LookupEmailFromToken(google.AuthToken);
                     if (!string.IsNullOrEmpty(cachedEmail))
                     {
                         return cachedEmail;
                     }
 
-                    var googleInfo = await GetProviderInfo(google.AccessToken);
+                    var googleInfo = await GetProviderInfo(google.AuthToken);
                     var userEmail = googleInfo.Value<string>("email");
 
-                    await StoreToken(google.AccessToken, userEmail);
+                    if (!string.IsNullOrEmpty(_clientId))
+                    {
+                        var aud = googleInfo.Value<string>("aud");
+                        if (string.Compare(_clientId, aud) != 0)
+                        {
+                            // Not valid
+                            return null;
+                        }
+                    }
+
+                    await StoreToken(google.AuthToken, userEmail);
 
                     return userEmail;
                 }
@@ -66,25 +77,25 @@ namespace MyHomeSecureWeb.Utilities
             return null;
         }
 
-        private string LookupEmailFromToken(string accessToken)
+        private string LookupEmailFromToken(string authToken)
         {
             using (IAwayStatusRepository awayStatusRepository = new AwayStatusRepository())
             {
-                var awayStatus = awayStatusRepository.LookupGoogleToken(accessToken);
+                var awayStatus = awayStatusRepository.LookupGoogleToken(authToken);
                 return awayStatus != null ? awayStatus.UserName : null;
             }
         }
-        private async Task StoreToken(string accessToken, string emailAddress)
+        private async Task StoreToken(string authToken, string emailAddress)
         {
             using (IAwayStatusRepository awayStatusRepository = new AwayStatusRepository())
             {
-                await awayStatusRepository.SetGoogleTokenAsync(emailAddress, accessToken);
+                await awayStatusRepository.SetGoogleTokenAsync(emailAddress, authToken);
             }
         }
 
-        private async Task<JToken> GetProviderInfo(string accessToken)
+        private async Task<JToken> GetProviderInfo(string authToken)
         {
-            string url = string.Format(GoogleTokenUrl, accessToken);
+            string url = string.Format(GoogleTokenUrl, authToken);
             using (var httpClient = new HttpClient())
             {
                 var response = await httpClient.GetAsync(url);
