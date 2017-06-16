@@ -16,6 +16,9 @@ namespace MyHomeSecureWeb.Utilities
         {
             return WebConfigurationManager.AppSettings["ClientSecret"];
         }
-
+        public static string GetFirebaseServerKey()
+        {
+            return WebConfigurationManager.AppSettings["FirebaseServerKey"];
+        }
     }
 }

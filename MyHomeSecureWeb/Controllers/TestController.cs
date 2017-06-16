@@ -15,13 +15,18 @@ namespace MyHomeSecureWeb.Controllers
         public ApiServices Services { get; set; }
 
         private static string TestHubId = "<hub-id>";
+        private ILookupToken _lookupToken = new LookupToken();
 
         [HttpGet]
         [Route("api/test/notify")]
-        public async Task<IHttpActionResult> notify(string state, bool active)
+        public async Task<IHttpActionResult> notify(string state, bool active, string email = null)
         {
-            //var statusNotification = new StateNotification(Services);
-            //await statusNotification.Send(TestHubId, state, active, "garage", "rule");
+            var hubId = !string.IsNullOrEmpty(email)
+                ? _lookupToken.GetHomeHubIdFromEmail(email)
+                : TestHubId;
+
+            var statusNotification = new StateNotification(Services);
+            await statusNotification.Send(hubId, state, active, "garage", "rule");
 
             var message = JsonConvert.SerializeObject(new StatusMessage
             {
