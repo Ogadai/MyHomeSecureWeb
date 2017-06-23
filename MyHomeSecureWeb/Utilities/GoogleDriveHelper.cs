@@ -14,7 +14,7 @@ namespace MyHomeSecureWeb.Utilities
     public class GoogleDriveHelper : IGoogleDriveHelper
     {
         private const string _createFolderAddress = "https://www.googleapis.com/drive/v2/files";
-        private const string _searchAddressTemplate = "https://www.googleapis.com/drive/v2/files?corpus=DOMAIN&spaces=drive&q={0}";
+        private const string _searchAddressTemplate = "https://www.googleapis.com/drive/v2/files?spaces=drive&q={0}"; // corpus=DOMAIN&
         private const string _fileAPIAddressTemplate = _createFolderAddress + "/{0}";
 
         private const string _fileGetContentAddressTemplate = _createFolderAddress + "/{0}?alt=media";
