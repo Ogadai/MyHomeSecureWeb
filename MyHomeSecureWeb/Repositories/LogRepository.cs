@@ -1,6 +1,7 @@
 ﻿using MyHomeSecureWeb.DataObjects;
 using MyHomeSecureWeb.Models;
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace MyHomeSecureWeb.Repositories
@@ -49,8 +50,8 @@ namespace MyHomeSecureWeb.Repositories
         public void PurgeOldLogEntries()
         {
             db.Database.ExecuteSqlCommand(
-                "DELETE FROM ogadai_secure.LogEntries WHERE Time < {0}",
-                DateTime.Now.AddDays(-2));
+                "DELETE FROM ogadai_secure.LogEntries WHERE Time < @OldTime",
+                new SqlParameter("@OldTime", DateTime.Today.AddDays(-2)));
         }
 
         public void Dispose()

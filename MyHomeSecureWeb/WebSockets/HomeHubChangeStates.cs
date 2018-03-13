@@ -37,30 +37,32 @@ namespace MyHomeSecureWeb.WebSockets
 
                     if (changed)
                     {
-                        string severity = _priorityStates.Contains(state.Name) ? "Priority" : "Info";
-
-                        string logMessage = string.Format("{0} changed to {1}", state.Name, state.Active ? "Active" : "Inactive");
-                        if (!string.IsNullOrEmpty(state.Node))
+                        if (_priorityStates.Contains(state.Name))
                         {
-                            logMessage = string.Format("{0} > {1}", logMessage, state.Node);
-                        }
-                        if (!string.IsNullOrEmpty(state.Rule))
-                        {
-                            logMessage = string.Format("{0} | {1}", logMessage, state.Rule);
-                        }
+                            string logMessage = string.Format("{0} changed to {1}", state.Name, state.Active ? "Active" : "Inactive");
+                            if (!string.IsNullOrEmpty(state.Node))
+                            {
+                                logMessage = string.Format("{0} > {1}", logMessage, state.Node);
+                            }
+                            if (!string.IsNullOrEmpty(state.Rule))
+                            {
+                                logMessage = string.Format("{0} | {1}", logMessage, state.Rule);
+                            }
 
-                        _logRepository.LogEntry(_homeHubSocket.HomeHubId, severity, logMessage);
+                            _logRepository.Priority(_homeHubSocket.HomeHubId, logMessage);
+                        }
 
                         if (_alertStates.Keys.Contains(state.Name))
                         {
                             ClearTimerUpdates();
                             if (state.Active)
                             {
-                                var timerStates = new HubChangeStates {
+                                var timerStates = new HubChangeStates
+                                {
                                     States = new HubChangeState[] {
-                                        new HubChangeState { Name = state.Name, Active = false },
-                                        new HubChangeState { Name = _alertStates[state.Name], Active = true }
-                                    }
+                                    new HubChangeState { Name = state.Name, Active = false },
+                                    new HubChangeState { Name = _alertStates[state.Name], Active = true }
+                                }
                                 };
 
                                 AddTimerUpdate(timerStates, AlertToAlarmMS);
