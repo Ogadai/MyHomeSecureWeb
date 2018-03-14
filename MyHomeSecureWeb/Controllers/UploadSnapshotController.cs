@@ -2,7 +2,6 @@
 using Microsoft.WindowsAzure.Mobile.Service.Security;
 using MyHomeSecureWeb.Repositories;
 using MyHomeSecureWeb.Utilities;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -43,12 +42,6 @@ namespace MyHomeSecureWeb.Controllers
             using (var videoHub = VideoHub.Get(homeHub.Id, node))
             {
                 var bodyBytes = await Request.Content.ReadAsByteArrayAsync();
-
-                using (var writer = new BinaryWriter(new FileStream("C:\\Work\\Test\\timelapse.jpg", FileMode.Create)))
-                {
-                    writer.Write(bodyBytes);
-                }
-
                 videoHub.ReceivedData(bodyBytes, bodyBytes.Length);
 
                 SnapshotArchiver.Queue(homeHub.Id, node, bodyBytes);
