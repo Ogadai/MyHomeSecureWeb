@@ -33,6 +33,18 @@ namespace MyHomeSecureWeb.Repositories
             db.SaveChanges();
         }
 
+        public void SetMakerToken(string userName, string token)
+        {
+            var user = GetStatus(userName);
+            user.MakerApiToken = token;
+            db.SaveChanges();
+        }
+
+        public AwayStatus LookupMakerToken(string token)
+        {
+            return db.AwayStatus.SingleOrDefault(s => s.MakerApiToken == token);
+        }
+
         public async Task SetGoogleTokenAsync(string userName, string googleToken)
         {
             var user = GetStatus(userName);

@@ -23,6 +23,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -302,9 +303,11 @@
     <Compile Include="Controllers\CameraListController.cs" />
     <Compile Include="Controllers\CameraSnapshotController.cs" />
     <Compile Include="Controllers\CameraStreamController.cs" />
+    <Compile Include="Controllers\GoogleOath2Controller.cs" />
     <Compile Include="Controllers\HomeHubController.cs" />
     <Compile Include="Controllers\HubLocationController.cs" />
     <Compile Include="Controllers\LogController.cs" />
+    <Compile Include="Controllers\PushStateController.cs" />
     <Compile Include="Controllers\SetupDriveController.cs" />
     <Compile Include="Controllers\SetupTokenController.cs" />
     <Compile Include="Controllers\StaticController.cs" />
@@ -398,6 +401,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="Views\PushStateNotFound.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\SetupDriveNotFound.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -418,11 +425,11 @@
   <ItemGroup>
     <None Include="Properties\PublishProfiles\ogadai-secure - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\ogadai-secure - Web Deploy.pubxml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\SetupDriveNotFound.cshtml">
+    <Content Include="Views\PushStateViewLink.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Views\_Layout.cshtml">
       <BrowseToURL>~/Views/_Layout.cshtml</BrowseToURL>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -10,6 +10,8 @@ namespace MyHomeSecureWeb.Repositories
         AwayStatus GetStatus(string userName);
         void UpdateStatus(string userName, bool away);
         void SetToken(string userName, byte[] tokenHash, byte[] salt);
+        void SetMakerToken(string userName, string token);
+        AwayStatus LookupMakerToken(string token);
         void AddUser(string userName, string homeHubId);
         void RemoveUser(string userName);
         IQueryable<AwayStatus> GetAllForHub(string homeHubId);

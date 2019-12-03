@@ -1,0 +1,16 @@
+﻿@{
+    Layout = "_Layout.cshtml";
+}
+PushState link for @Model.UserName
+
+<div>
+    POST to "@Model.Link"
+</div>
+
+<pre>
+{
+    "token": "@Model.Token",
+    "name": "{state-name}",
+    "active": {true/false}
+}
+</pre>
